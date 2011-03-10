@@ -1,0 +1,47 @@
+TX/RX Test Plan:
+
+inputs   : S_Data
+internal : type, packet data
+
+1.] Test Invalid Start Sequences
+	- Set Reset_n to 0. 
+	- Input *invalid* start sequences (for loop with bit shift):
+		01_1110
+		01_1011
+		... 
+	** RX unit should not begin packet capture (enter capture state) **
+
+2.] Test Valid Start Sequence
+    	 - Set Reset_n to 0.
+	 - Input *valid* start sequence trailing an invalid sequence.
+	   Use bit shift with for loop as in previous test:
+		 0110_0101_1111
+	** RX unit should begin packet capture **
+
+3.] Verify received data-type
+	- Force RX module past start sequence (ready to accept type)
+	- For each valid data-type, make sure the RX unit correctly
+	       recognizes the sequence (i.e. correct state):
+		Token - 111
+		ACK   - 000
+		NACK  - 011
+		DATA-C- 010
+		DATA-3- 001
+
+4.] Test *invalid* data-types
+	- Same as previous, except use invalid sequences:
+		101
+		110
+		.. etc.
+	** RX unit should transition into invalid data-type state.
+
+5.] Verify data transfer under normal conditions :
+    	   - Set Reset_n to 0.
+	   - Input valid start sequence:
+	     	 01_1111
+	   - Input DATA-C type code:
+	     	 010
+	   - Send data payload
+	** Verify received data payload matches transfered **
+	   - Repeat for DATA-3 type
+
