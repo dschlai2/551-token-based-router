@@ -1,4 +1,4 @@
-module receiver(input RX_Ready, Clk_S, Rst_n, S_data, output reg RX_Data_Valid, output [54:0] RX_Data);
+module receiver(input RX_Ready, Clk_S, Rst_n, S_Data, output reg RX_Data_Valid, output [54:0] RX_Data);
 
 	reg[1:0] state, nextState;
 
@@ -6,8 +6,8 @@ module receiver(input RX_Ready, Clk_S, Rst_n, S_data, output reg RX_Data_Valid, 
 
 
 	// Transmission Protocol Unit
-	trans_Protocol rx_side(	.clk		(Clk_S),
-				.rst		(Reset_n),
+	receive_protocol rx_side(	.clk		(Clk_S),
+				.rst		(Rst_n),
 				.S_Data		(S_Data),
 				.ready		(good_data),
 				.packet		(RX_Data[54:0]));

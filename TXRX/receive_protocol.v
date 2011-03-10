@@ -1,4 +1,6 @@
-module receive_protocol(input S_Data, clk, rst, output reg [54:0] packet, output reg ready);
+module receive_protocol(input S_Data, clk, rst, 
+    output reg [54:0] packet,
+    output reg 	      ready);
 
 reg [2:0] state, next_state;
 reg next_in;

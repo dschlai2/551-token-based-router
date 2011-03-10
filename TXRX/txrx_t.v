@@ -4,7 +4,7 @@ module txrx_t();
 
    /* inputs to TX/RX unit */
    reg [54:0] TX_Data;
-   reg 	      TX_Data_Valid, Clk_S, Reset_n, RX_Ready;
+   reg 	      TX_Data_Valid, Clk_S, Rst_n, RX_Ready;
 
    /* outputs from TX/RX */
    wire        TX_Ready, RX_Data_Valid;
@@ -34,34 +34,37 @@ module txrx_t();
 
    initial begin
 
-      $monitor("%t::\tTX_Rdy:%b\t RX_Dta:%h\t RX_dv:%b",
-	       $time, TX_Ready, RX_Data, RX_Data_Valid);
+      $monitor("%t::\t TX_Rdy:%b\t RX_Dta:%h\t RX_dv:%b\t S_Data: %b",
+	       $time, TX_Ready, RX_Data, RX_Data_Valid, S_Data);
 
       Clk_S = 0;
-      TX_Data = 55'h abcd;
+      TX_Data = 55'd 3;
       TX_Data_Valid = 1;
       RX_Ready = 0;
 
       
       /* Testing Rst_n */
-      $display("% Lowering Rst_N");
+      $display("Lowering Rst_N");
       #0 Rst_n = 0;
       
       if (TX_Ready != 0) $display ("*** TX_Ready did not go to 0");
       if (S_Data != 0) $display ("*** S_Data did not go to 0");
       if (RX_Data_Valid != 0) $display ("*** RX_Data_Valid did not go to 0");
       #10;
+      Rst_n = 1;
+      #5;
+      
 
       /* Lowering TX_Data_Valid */
-      $display("& Lowering TX_Data_Valid.");
+      $display("Lowering TX_Data_Valid.");
       TX_Data_Valid = 0;
-      #5;
+      #10;
       if (TX_Ready != 1) $display("*** TX_Ready did not go to 1");
       #7;
 
 
       /* Raising TX_Data_Valid */
-      $display("% Raising TX_Data_Valid.");
+      $display("Raising TX_Data_Valid.");
       TX_Data_Valid = 1;
       #9;
       TX_Data_Valid = 0;
@@ -69,11 +72,12 @@ module txrx_t();
 
       
       /* DATA IS IN TRANSMISSION */
-      #120;
+      #200;
       if (TX_Ready != 1) $display("*** TX_Ready did not go to 1 after transmit.");
       if (RX_Data_Valid != 1) $display("*** RX_Data_Valid did not go to 1 after transmit.");
       if (RX_Data != TX_Data) $display("*** RX_Data does not match TX_Data.");
-
+      $display ("TX_Data: %h\t RX_Data: %h",TX_Data, RX_Data);
+      
       $stop;
    end // initial begin
 endmodule // txrx_t
