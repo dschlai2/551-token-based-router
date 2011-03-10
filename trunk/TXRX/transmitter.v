@@ -1,4 +1,4 @@
-// TX Unit Behavioral Verilog
+// TX Unit Behavioral Verilog //
 
 module transmitter (input [54:0] TX_Data,
                     input TX_Data_Valid, Clk_S, Rst_n,

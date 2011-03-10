@@ -1,8 +1,9 @@
 module receive_protocol(input S_Data, clk, rst, output reg [54:0] packet, output reg ready);
 
-reg [1:0] state, next_state;
-
-reg [5:0] start_seq, counter , next_counter; 
+reg [2:0] state, next_state;
+reg next_in;
+reg [5:0] start_seq;
+reg [6:0] next_counter, counter; 
 
 parameter WAIT = 3'b001, READ = 3'b010 , DONE = 3'b100;
 
@@ -17,23 +18,24 @@ always@(posedge clk, negedge rst) begin
 		counter <= next_counter;
 end
 
-always@(state, start_seq) begin
+always@(*) begin
 
 	case(state) 
 
 	WAIT: if(start_seq == 6'b011111) begin
 		next_state = READ;
-		next_counter = 6'd55;
-		end
+		next_counter = 7'd55;
+		packet[next_counter-1] = S_Data;
+				end
 	      else
 		next_state = WAIT;
 
-	READ: if(counter == 0)
+	READ: if(next_counter == 0)
 		next_state = DONE;
 	      else begin
 		next_state = READ;
 		next_counter = counter - 1;
-		packet[counter-1] = S_Data;
+		packet[next_counter-1] = S_Data;
 	     end
 
 	DONE: next_state = WAIT;
@@ -43,9 +45,10 @@ end
 		
 always@(state) begin
 
-	if(state == DONE)
+	if(state == DONE)begin
 		ready = 1'b1;
-	else
+		start_seq <= 6'b111111;
+	end else
 		ready = 1'b0;
 end
 
