@@ -92,6 +92,11 @@ module trans_protocol(input [54:0] TX_Data,
 	   S_Data = 1'b0;
 	   ready = 1'b1;
 	end
+
+	WAIT: begin
+	   S_Data = 1'b0;
+	   ready = 1'b0;
+	end
 	
 	default: begin
 	   S_Data = 1'bx;

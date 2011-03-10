@@ -1,4 +1,10 @@
-module receiver(input RX_Ready, Clk_S, Rst_n, S_Data, output reg RX_Data_Valid, output [54:0] RX_Data);
+module receiver(
+    input       RX_Ready, 
+		Clk_S, 
+		Rst_n, 
+		S_Data, 
+    output reg 	  RX_Data_Valid, 
+    output [54:0] RX_Data);
 
 	reg[1:0] state, nextState;
 
