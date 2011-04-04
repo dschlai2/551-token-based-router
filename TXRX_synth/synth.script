@@ -5,15 +5,15 @@
 remove_design -designs
 
 ## Load files ##
-read_file -format verilog ./transmitter.v
-read_file -format verilog ./trans_protocol.v
+read_file -format verilog ./receiver.v
+read_file -format verilog ./receive_protocol.v
 
 
 ## Set top-level module
-current_design transmitter
+current_design receiver
 
 ## Elaborate
-elaborate transmitter
+elaborate receiver
 
 ## Check for errors
 check_design

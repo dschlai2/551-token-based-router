@@ -35,7 +35,6 @@ module transmitter (input [54:0] TX_Data,
 
    always @(TX_Data_Valid, ready, state) begin
       case (state)
-
 	RST: begin
 	   if (!TX_Data_Valid) begin
 	      next_state = RDY;
