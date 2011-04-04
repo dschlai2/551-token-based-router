@@ -66,8 +66,10 @@ module transmitter (input [54:0] TX_Data,
 	   end
 	end
 
-	default:
-	  next_state = 2'bxx;
+	default: begin
+	   next_state = 2'bxx;
+	   next_start = 1'bx;
+	end
       endcase // case (state)
    end // always @ (TX_Data_Valid, ready, state)
 

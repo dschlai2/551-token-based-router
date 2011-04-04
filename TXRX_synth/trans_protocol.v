@@ -14,7 +14,8 @@ module trans_protocol(input [54:0] TX_Data,
 		TRANSMIT = 3'd4,
 		DONE = 3'd5,
 		WAIT = 3'd6;
-   
+
+   reg 	       next_ready, next_S_Data;
    reg [3:0] state, next_state;
    reg [5:0] next_counter, counter;
 
@@ -25,8 +26,10 @@ module trans_protocol(input [54:0] TX_Data,
 	 S_Data <= 1'b0;
 	 ready <= 1'b0;
       end else begin
+	 S_Data <= next_S_Data;
 	 state <= next_state;
 	 counter <= next_counter;
+	 ready <= next_ready;
       end
    end
       
@@ -38,12 +41,13 @@ module trans_protocol(input [54:0] TX_Data,
 	  if (start) begin
 	     next_state = START;
 	     next_counter = sz_START_SEQ;
-	  end else
-	    next_state = WAIT;
+	  end else begin
+	     next_state = WAIT;
+	     next_counter = 6'bx;
+	  end
 
 	/* Transmitting start_seq */
 	START: begin
-	   ready = 1'b0;
 	   if (counter > 1) begin
 	      next_state = START;
 	      next_counter = counter - 1;
@@ -63,14 +67,20 @@ module trans_protocol(input [54:0] TX_Data,
 	     next_counter = counter - 1;
 	  end else begin
 	     next_state = DONE;
+	     next_counter = 6'bx;
 	  end
 
 
       /* Return to WAIT */
-	DONE:
-	  next_state = WAIT;
-	default:
-	  next_state = WAIT;
+	DONE: begin
+	   next_state = WAIT;
+	   next_counter = 6'bx;
+	end
+	
+	default: begin
+	   next_state = WAIT;
+	   next_counter = 6'bx;
+	end
       endcase // case (state)
    end // always @ (state)
 
@@ -79,28 +89,28 @@ module trans_protocol(input [54:0] TX_Data,
    always @(state, counter) begin
       case (state)
 	 START: begin
-	    S_Data = START_SEQ[counter-1];
-	    ready = 1'b0;
+	    next_S_Data = START_SEQ[counter-1];
+	    next_ready = 1'b0;
 	 end
 
 	 TRANSMIT: begin
-	    S_Data = TX_Data[counter-1];
-	    ready = 1'b0;
+	    next_S_Data = TX_Data[counter-1];
+	    next_ready = 1'b0;
 	 end	
 
 	DONE: begin
-	   S_Data = 1'b0;
-	   ready = 1'b1;
+	   next_S_Data = 1'b0;
+	   next_ready = 1'b1;
 	end
 
 	WAIT: begin
-	   S_Data = 1'b0;
-	   ready = 1'b0;
+	   next_S_Data = 1'b0;
+	   next_ready = 1'b0;
 	end
 	
 	default: begin
-	   S_Data = 1'bx;
-	   ready = 1'bx;
+	   next_S_Data = 1'bx;
+	   next_ready = 1'bx;
 	end
 	
       endcase // case state
