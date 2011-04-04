@@ -22,12 +22,12 @@
 # tcbn65gplus    - TSMC 65nm General Purpose
 # gflxp          - LSI 110nm General Purpose
 # Uncomment ONE of the TECH_LIB assignments or set variable via command line:
-set TECH_LIB tcbn40lpbwptc
+#set TECH_LIB tcbn40lpbwptc
 #set TECH_LIB tcbn40lpbwp12ttc
 #set TECH_LIB tcbn45gsbwptc
 #set TECH_LIB tcbn45gsbwphvttc
 #set TECH_LIB tcbn65gplustc
-#set TECH_LIB gflxp
+set TECH_LIB gflxp
 switch $TECH_LIB {
         gflxp {
                 set IO_LIB [string map {d io p io v vio} $TECH_LIB]
