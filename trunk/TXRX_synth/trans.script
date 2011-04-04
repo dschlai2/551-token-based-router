@@ -17,5 +17,4 @@ elaborate transmitter
 
 ## Check for errors
 check_design
-
 exit
