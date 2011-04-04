@@ -1,10 +1,11 @@
-/* This module handles the transmission protocol for the
- TX unit.  Transmission begins on start signal.  */
- 
-module trans_protocol(input [54:0] TX_Data,
-    input start, rst, clk,
-    output reg ready, S_Data);
-   
+module trans_protocol(TX_Data,
+    start, rst, clk,
+    ready, S_Data);
+
+   input [54:0] TX_Data;
+   input 	start, rst, clk;
+   output reg 	ready, S_Data;
+      
    parameter sz_START_SEQ = 5'd6,
 	       sz_DATA =  6'd55;
       
@@ -15,7 +16,7 @@ module trans_protocol(input [54:0] TX_Data,
 		DONE = 3'd5,
 		WAIT = 3'd6;
 
-   reg 	       next_ready, next_S_Data;
+   reg 	     next_ready, next_S_Data;
    reg [3:0] state, next_state;
    reg [5:0] next_counter, counter;
 

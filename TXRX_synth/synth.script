@@ -5,18 +5,50 @@
 remove_design -designs
 
 ## Load files ##
-read_file -format verilog ./receiver.v
-read_file -format verilog ./receive_protocol.v
-
+read_file -format verilog ./transmitter.v
+read_file -format verilog ./trans_protocol.v
 
 ## Set top-level module
-current_design receiver
+current_design transmitter
 
 ## Elaborate
-elaborate receiver
+elaborate transmitter
 
 ## Check for errors
 check_design
 
+## Create clock network (Values are in nanoseconds)
+create_clock "Clk_S" -period 20 -waveform { 0 10 }
+## Set clk as don't touch
+set_dont_touch_network [find port Clk_S]
+
+## Set environmental operating characteristics - Needed for accurate area and timing estimates
+## Link ensures that all modules are connected before setting characteristics.
+link
+set prim_inputs [remove_from_collection [all_inputs] [find port Clk_S]]
+## This determines input drive strength
+set_driving_cell -lib_cell DDRVLS33 -pin Z -from_pin A -library gflxio [copy_collection $prim_inputs]
+## Apply the same wire load model from the top-level module to all children
+set_wire_load_mode top
+set_wire_load_model -name B1X1 -library gflxp
+## Sets the operating conditions to the Nominal setting from the gflxp library
+set_operating_conditions NOM -library gflxp
+## Set Input/Output Delays
+set_input_delay -clock Clk_S 0 [copy_collection $prim_inputs]
+set_output_delay -clock Clk_S 0 [all_outputs]
+
+## Set Area Constraint
+set_max_area 0
+
+### Compile
+compile -area_effort low
+
+### Verify Timing Success
+check_timing
+
+## Print reports
+report_area
+report_timing
+report_constraints -all_violators
 
 exit
