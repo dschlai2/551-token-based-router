@@ -19,9 +19,9 @@ elaborate transmitter
 check_design
 
 ## Create clock network (Values are in nanoseconds)
-create_clock "clk" -period 20 -waveform { 0 10 }
+create_clock "Clk_S" -period 20 -waveform { 0 10 }
 ## Set clk as don't touch
-set_dont_touch_network [find port clk]
+set_dont_touch_network [find port Clk_S]
 
 ## Set environmental operating characteristics - Needed for accurate area and timing estimates
 ## Link ensures that all modules are connected before setting characteristics.
@@ -37,8 +37,8 @@ set_wire_load_model -name TSCM128K_Lowk_Aggresive -library tcbn40lpbwptc
 ## Sets the operating conditions to the Nominal setting from the gflxp library
 set_operating_conditions -library tcbn40lpbwptc NCCOM
 ## Set Input/Output Delays
-set_input_delay -clock clk 0 [copy_collection $prim_inputs]
-set_output_delay -clock clk 0 [all_outputs]
+set_input_delay -clock Clk_S 0 [copy_collection $prim_inputs]
+set_output_delay -clock Clk_S 0 [all_outputs]
 
 ## Set Area Constraint
 set_max_area 0
