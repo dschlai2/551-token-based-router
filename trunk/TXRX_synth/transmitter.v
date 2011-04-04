@@ -11,7 +11,7 @@ module transmitter (input [54:0] TX_Data,
 
    reg [1:0] state, next_state;
    wire      ready;
-   reg 	     start, next_start;
+   reg 	     start, next_TX_Ready, next_start;
 
    trans_protocol protocol(.clk(Clk_S), 
 			   .start(start), 
@@ -23,12 +23,13 @@ module transmitter (input [54:0] TX_Data,
    always @(posedge Clk_S, negedge Rst_n) begin
       if (!Rst_n) begin
 	 state <= RST;
-	 TX_Ready <= 1'b0;
 	 start <= 1'b0;
+	 TX_Ready <= 1'b0;
       end
       else begin
-	start <= next_start;
-	state <= next_state;
+	 start <= next_start;
+	 state <= next_state;
+	 TX_Ready <= next_TX_Ready;
       end
    end
 
@@ -75,15 +76,19 @@ module transmitter (input [54:0] TX_Data,
       case(state)
 
 	RST: begin
-	   TX_Ready = 1'b0;
+	   next_TX_Ready = 1'b0;
 	end
 
 	RDY: begin
-	   TX_Ready = 1'b1;
+	   next_TX_Ready = 1'b1;
 	end
 
 	TRANSMIT: begin
-	   TX_Ready = 1'b0;
+	   next_TX_Ready = 1'b0;
+	end
+
+	default: begin
+	   next_TX_Ready = 1'b0;
 	end
       endcase
    end // always @ (state)
