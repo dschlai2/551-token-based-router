@@ -12,11 +12,10 @@ reg [54:0] next_packet;
 parameter WAIT = 3'b001, READ = 3'b010 , DONE = 3'b100;
 
 always@(posedge clk, negedge rst) begin
-
 	if(!rst) begin
-	   state <= 3'b001;
+	   state <= WAIT;
 	   start_seq <= 6'b111111;
-	   counter <= 7'd55;
+	   counter <= 7'd54;
 	   packet <= 55'b0;
 	end
 	else begin
@@ -30,14 +29,14 @@ end
 always@(*) begin
 
 	case(state) 
-
 	  WAIT: begin
-	     next_counter = 7'd55;
+	     next_counter = 7'd54;
 	     next_start_seq = {start_seq[4:0],S_Data};
 	     if(start_seq == 6'b011111) begin
 		next_state = READ;
 		next_packet = packet;
-		next_packet[next_counter-1] = S_Data;
+		next_packet[counter] = S_Data;
+		next_counter = counter -1;
 	     end else begin
 		next_state = WAIT;
 		next_packet = packet;
@@ -46,28 +45,28 @@ always@(*) begin
 	  
 	  READ:  begin
 	     next_start_seq = 6'b111111;
-	     if(next_counter == 0) begin
+	     if(counter == 0) begin
 		next_state = DONE;
-		next_counter = 7'b1;
+		next_counter = 7'd20;
 		next_packet = packet;
-		next_packet[next_counter-1] = packet[next_counter-1];
+		next_packet[counter] = S_Data;
 	     end else begin
 		next_state = READ;
-		next_counter = counter - 1;
 		next_packet = packet;
-		next_packet[next_counter-1] = S_Data;
+		next_packet[counter] = S_Data;
+		next_counter = counter-1;
 	     end
 	  end
 	  
 	  DONE: begin
-	     next_counter = 7'b1;
+	     next_counter = 7'd54;
 	     next_state = WAIT;
 	     next_start_seq = 6'b111111;
 	     next_packet = packet;
 	  end
 
 	  default: begin
-	     next_counter = 7'b1;
+	     next_counter = 7'd54;
 	     next_state = WAIT;
 	     next_start_seq = 6'b111111;
 	     next_packet = packet;
