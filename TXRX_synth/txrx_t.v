@@ -1,5 +1,7 @@
 /* Testbench for the TX/RX units combined */
 
+`timescale 1ns/100ps
+
 module txrx_t();
 
    /* inputs to TX/RX unit */
@@ -14,10 +16,13 @@ module txrx_t();
    wire        S_Data;
 
    /* Error signals */
-   wire        err_TX_Ready, err_S_Data, err_RX_Ready, err_S_Data, err_RX_Data_Valid, err_RX_Data;
+   wire        err_TX_Ready, err_S_Data, err_RX_Ready, err_RX_Data_Valid, err_RX_Data;
    wire        err_ANY;
         
-   
+   /* outputs from synth modules */
+   wire        TX_Ready_s, RX_Data_Valid_s;
+   wire [54:0] RX_Data_s;
+   wire        S_Data_s;
 
    
    transmitter tx (.TX_Data(TX_Data),
@@ -38,29 +43,26 @@ module txrx_t();
 			   .TX_Data_Valid(TX_Data_Valid),
 			   .Clk_S(Clk_S),
 			   .Rst_n(Rst_n),
-			   .TX_Ready(TX_Ready),
-			   .S_Data(S_Data));
+			   .TX_Ready(TX_Ready_s),
+			   .S_Data(S_Data_s));
 
    receiver_synth rx_s (.RX_Ready(RX_Ready),
 		.Clk_S(Clk_S),
 		.Rst_n(Rst_n),
 		.S_Data(S_Data),
-		.RX_Data_Valid(RX_Data_Valid),
-		.RX_Data(RX_Data));
+		.RX_Data_Valid(RX_Data_Valid_s),
+		.RX_Data(RX_Data_s));
 
 
    /* Assign err signals to differences in each module */
-   assign err_TX_Ready = tx.TX_Ready != tx_s.TX_Ready;
-   assign err_S_Data = tx.S_Data != tx_s.S_Data;
-   assign err_RX_Ready = tx.RX_Ready != tx_s.RX_Ready;
-   assign err_S_Data = tx.S_Data != tx_s.S_Data;
-   assign err_RX_Data_Valid = tx.RX_Data_Valid != tx_s.RX_Data_Valid;
-   assign err_RX_Data = tx.RX_Data != tx_s.RX_Data;
-
+   assign err_TX_Ready = TX_Ready != TX_Ready_s;
+   assign err_S_Data = S_Data != S_Data_s;
+   assign err_RX_Data_Valid = RX_Data_Valid != RX_Data_Valid_s;
+   assign err_RX_Data = RX_Data != RX_Data_s;
    assign err_ANY = err_TX_Ready|err_S_Data|err_RX_Ready|err_S_Data|err_RX_Data_Valid|err_RX_Data;
    
    /* clock */
-   always @(Clk_S) #1 Clk_S <= ~Clk_S;
+   always @(Clk_S) #10 Clk_S <= ~Clk_S;
 
 
    initial begin
@@ -70,7 +72,7 @@ module txrx_t();
 	       $time, rx.rx_side.counter, TX_Ready, RX_Data, RX_Data_Valid, S_Data); 
        */
 
-      $moniter("%b %b %b %b %b %b %b", err_TX_Ready, err_S_Data, err_RX_Ready, err_S_Data, err_RX_Data_Valid, err_RX_Data, err_ANY);
+      $monitor("%b %b %b %b %b %b", err_TX_Ready, err_RX_Ready, err_S_Data, err_RX_Data_Valid, err_RX_Data, err_ANY);
 
       Clk_S = 0;
       TX_Data = 55'd3;
@@ -80,24 +82,52 @@ module txrx_t();
       
       /* Testing Rst_n */
       //$display("Lowering Rst_N");
-      #0 Rst_n = 0;
+      #1 Rst_n = 0;
       
       if (TX_Ready != 0) $display ("*** TX_Ready did not go to 0");
       if (S_Data != 0) $display ("*** S_Data did not go to 0");
       if (RX_Data_Valid != 0) $display ("*** RX_Data_Valid did not go to 0");
-      #10;
+      #100;
       Rst_n = 1;
-      #5;
+      #50;
       
 
       /* Lowering TX_Data_Valid */
       $display("Lowering TX_Data_Valid.");
       TX_Data_Valid = 0;
-      #10;
+      #1000;
       if (TX_Ready != 1) $display("*** TX_Ready did not go to 1");
-      #7;
+      #7000;
 
 
+      /* Raising TX_Data_Valid */
+      $display("Raising TX_Data_Valid.");
+      TX_Data_Valid = 1;
+      #9000;
+      TX_Data_Valid = 0;
+      if (TX_Ready != 0) $display("*** TX_Ready did not go to 0 on transmit.");
+
+      
+      /* DATA IS IN TRANSMISSION */
+      #3000;
+      if (TX_Ready != 1) $display("*** TX_Ready did not go to 1 after transmit.");
+      if (RX_Data != TX_Data) $display("*** RX_Data does not match TX_Data.");
+
+      /* Raising RX_Ready */
+      RX_Ready = 1;
+      #2000;
+      if (RX_Data_Valid != 1) $display("*** RX_Data_Valid did not go to 1 after transmit.");
+      $display ("TX_Data: %h\t RX_Data: %h",TX_Data, RX_Data);
+
+
+
+
+      
+      /* Sending a second packet */
+      TX_Data = 55'b101101110_1110001110_101101110_1110001110_101101110_11101;
+      RX_Ready = 0;
+
+      #1000;
       /* Raising TX_Data_Valid */
       $display("Raising TX_Data_Valid.");
       TX_Data_Valid = 1;
@@ -107,16 +137,17 @@ module txrx_t();
 
       
       /* DATA IS IN TRANSMISSION */
-      #300;
+      #6000;
       if (TX_Ready != 1) $display("*** TX_Ready did not go to 1 after transmit.");
       if (RX_Data != TX_Data) $display("*** RX_Data does not match TX_Data.");
 
       /* Raising RX_Ready */
       RX_Ready = 1;
-      #20;
+      #200;
       if (RX_Data_Valid != 1) $display("*** RX_Data_Valid did not go to 1 after transmit.");
       $display ("TX_Data: %h\t RX_Data: %h",TX_Data, RX_Data);
 
+      #2000;
 
 
 
@@ -130,56 +161,24 @@ module txrx_t();
       $display("Raising TX_Data_Valid.");
       TX_Data_Valid = 1;
       #9;
-      TX_Data_Valid = 0;
+      TX_Data_Valid = 1;
       if (TX_Ready != 0) $display("*** TX_Ready did not go to 0 on transmit.");
 
       
       /* DATA IS IN TRANSMISSION */
       #600;
-      if (TX_Ready != 1) $display("*** TX_Ready did not go to 1 after transmit.");
-      if (RX_Data != TX_Data) $display("*** RX_Data does not match TX_Data.");
-
-      /* Raising RX_Ready */
-      RX_Ready = 1;
-      #20;
-      if (RX_Data_Valid != 1) $display("*** RX_Data_Valid did not go to 1 after transmit.");
-      $display ("TX_Data: %h\t RX_Data: %h",TX_Data, RX_Data);
-
-      #200;
-
-
-
-      
-      /* Sending a second packet */
-      TX_Data = 55'b101101110_1110001110_101101110_1110001110_101101110_11101;
-      RX_Ready = 0;
-
-      #10;
-      /* Raising TX_Data_Valid */
-      $display("Raising TX_Data_Valid.");
-      TX_Data_Valid = 1;
-      #9;
-      TX_Data_Valid = 1;
-      if (TX_Ready != 0) $display("*** TX_Ready did not go to 0 on transmit.");
-
-      
-      /* DATA IS IN TRANSMISSION */
-      #60;
 
       $display ("Resetting during transmission.");
       Rst_n = 0;
-      #2;
+      #200;
       
 
       if (TX_Ready != 0) $display ("*** TX_Ready did not go to 0");
       if (S_Data != 0) $display ("*** S_Data did not go to 0");
       if (RX_Data_Valid != 0) $display ("*** RX_Data_Valid did not go to 0");
-      #10;
+      #100;
       Rst_n = 1;
-      #5;
-
-      
-      
+      #50;
       $stop;
    end // initial begin
 endmodule // txrx_t
