@@ -106,7 +106,7 @@ module receive_protocol_DW01_decode_1 ( A, B );
 endmodule
 
 
-module receive_protocol ( S_Data, clk, rst, packet, ready );
+module receive_protocol_synth ( S_Data, clk, rst, packet, ready );
   output [54:0] packet;
   input S_Data, clk, rst;
   output ready;
@@ -620,14 +620,14 @@ module receive_protocol ( S_Data, clk, rst, packet, ready );
 endmodule
 
 
-module receiver ( RX_Ready, Clk_S, Rst_n, S_Data, RX_Data_Valid, RX_Data );
+module receiver_synth ( RX_Ready, Clk_S, Rst_n, S_Data, RX_Data_Valid, RX_Data );
   output [54:0] RX_Data;
   input RX_Ready, Clk_S, Rst_n, S_Data;
   output RX_Data_Valid;
   wire   good_data, \state[0] , n3, n4, n5;
   wire   [1:0] nextState;
 
-  receive_protocol rx_side ( .S_Data(S_Data), .clk(Clk_S), .rst(Rst_n), 
+  receive_protocol_synth rx_side ( .S_Data(S_Data), .clk(Clk_S), .rst(Rst_n), 
         .packet(RX_Data), .ready(good_data) );
   FD2QM1P \state_reg[1]  ( .D(nextState[1]), .CP(Clk_S), .CD(Rst_n), .Q(
         RX_Data_Valid) );

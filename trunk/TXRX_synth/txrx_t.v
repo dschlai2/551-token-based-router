@@ -28,14 +28,18 @@ module txrx_t();
 		.RX_Data_Valid(RX_Data_Valid),
 		.RX_Data(RX_Data));
 
+   
+
    /* clock */
    always @(Clk_S) #1 Clk_S <= ~Clk_S;
 
 
    initial begin
 
-      $monitor("%t::\tctr: %d TX_Rdy:%b\t RX_Dta:%h\t RX_dv:%b\t S_Data: %b\t",
-	       $time, rx.rx_side.counter, TX_Ready, RX_Data, RX_Data_Valid, S_Data);
+      /*
+       $monitor("%t::\tctr: %d TX_Rdy:%b\t RX_Dta:%h\t RX_dv:%b\t S_Data: %b\t",
+	       $time, rx.rx_side.counter, TX_Ready, RX_Data, RX_Data_Valid, S_Data); 
+       */
 
       Clk_S = 0;
       TX_Data = 55'd3;
@@ -44,7 +48,7 @@ module txrx_t();
 
       
       /* Testing Rst_n */
-      $display("Lowering Rst_N");
+      //$display("Lowering Rst_N");
       #0 Rst_n = 0;
       
       if (TX_Ready != 0) $display ("*** TX_Ready did not go to 0");

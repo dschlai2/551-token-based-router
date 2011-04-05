@@ -1,5 +1,5 @@
 
-module trans_protocol ( TX_Data, start, rst, clk, ready, S_Data );
+module trans_protocol_synth ( TX_Data, start, rst, clk, ready, S_Data );
   input [54:0] TX_Data;
   input start, rst, clk;
   output ready, S_Data;
@@ -293,7 +293,7 @@ module trans_protocol ( TX_Data, start, rst, clk, ready, S_Data );
 endmodule
 
 
-module transmitter ( TX_Data, TX_Data_Valid, Clk_S, Rst_n, TX_Ready, S_Data );
+module transmitter_synth ( TX_Data, TX_Data_Valid, Clk_S, Rst_n, TX_Ready, S_Data );
   input [54:0] TX_Data;
   input TX_Data_Valid, Clk_S, Rst_n;
   output TX_Ready, S_Data;
@@ -301,7 +301,7 @@ module transmitter ( TX_Data, TX_Data_Valid, Clk_S, Rst_n, TX_Ready, S_Data );
   wire   [1:0] state;
   wire   [1:0] next_state;
 
-  trans_protocol protocol ( .TX_Data(TX_Data), .start(start), .rst(n4), .clk(
+  trans_protocol_synth protocol ( .TX_Data(TX_Data), .start(start), .rst(n4), .clk(
         Clk_S), .ready(ready), .S_Data(S_Data) );
   FD2QM1P TX_Ready_reg ( .D(n6), .CP(Clk_S), .CD(Rst_n), .Q(TX_Ready) );
   FD2QM1P \state_reg[1]  ( .D(next_state[1]), .CP(Clk_S), .CD(Rst_n), .Q(
