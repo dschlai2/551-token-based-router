@@ -1,4 +1,4 @@
-module encoder_3of6(input [23:0] payload, output [47:0] out);
+module threeOfSixEncoder(input [23:0] payload, output [47:0] out);
 
 //Instantiate all 8 appenders
 
