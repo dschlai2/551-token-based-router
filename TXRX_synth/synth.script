@@ -18,7 +18,7 @@ elaborate transmitter
 check_design
 
 ## Create clock network (Values are in nanoseconds)
-create_clock "Clk_S" -period 20 -waveform { 0 10 }
+create_clock "Clk_S" -period .25 -waveform { 0 0.125 }
 ## Set clk as don't touch
 set_dont_touch_network [find port Clk_S]
 
