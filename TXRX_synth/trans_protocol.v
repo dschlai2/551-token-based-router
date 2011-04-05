@@ -67,7 +67,7 @@ module trans_protocol(TX_Data,
 	
 	/* Transmitting data */
 	TRANSMIT:
-	  if (counter > 1) begin
+	  if (counter >= 1) begin
 	     next_state = TRANSMIT;
 	     next_counter = counter - 1;
 	  end else begin

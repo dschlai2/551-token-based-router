@@ -34,11 +34,11 @@ module txrx_t();
 
    initial begin
 
-      $monitor("%t::\t TX_Rdy:%b\t RX_Dta:%h\t RX_dv:%b\t S_Data: %b\t",
-	       $time, TX_Ready, RX_Data, RX_Data_Valid, S_Data);
+      $monitor("%t::\tctr: %d TX_Rdy:%b\t RX_Dta:%h\t RX_dv:%b\t S_Data: %b\t",
+	       $time, rx.rx_side.counter, TX_Ready, RX_Data, RX_Data_Valid, S_Data);
 
       Clk_S = 0;
-      TX_Data = 55'd 3;
+      TX_Data = 55'd3;
       TX_Data_Valid = 1;
       RX_Ready = 0;
 
