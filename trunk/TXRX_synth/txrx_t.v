@@ -16,7 +16,7 @@ module txrx_t();
    wire        S_Data;
 
    /* Error signals */
-   wire        err_TX_Ready, err_S_Data, err_RX_Ready, err_RX_Data_Valid, err_RX_Data;
+   wire        err_TX_Ready, err_S_Data, err_RX_Data_Valid, err_RX_Data;
    wire        err_ANY;
         
    /* outputs from synth modules */
@@ -49,7 +49,7 @@ module txrx_t();
    receiver_synth rx_s (.RX_Ready(RX_Ready),
 		.Clk_S(Clk_S),
 		.Rst_n(Rst_n),
-		.S_Data(S_Data),
+		.S_Data(S_Data_s),
 		.RX_Data_Valid(RX_Data_Valid_s),
 		.RX_Data(RX_Data_s));
 
@@ -59,7 +59,7 @@ module txrx_t();
    assign err_S_Data = S_Data != S_Data_s;
    assign err_RX_Data_Valid = RX_Data_Valid != RX_Data_Valid_s;
    assign err_RX_Data = RX_Data != RX_Data_s;
-   assign err_ANY = err_TX_Ready|err_S_Data|err_RX_Ready|err_S_Data|err_RX_Data_Valid|err_RX_Data;
+   assign err_ANY = err_TX_Ready|err_S_Data|err_RX_Data_Valid|err_RX_Data;
    
    /* clock */
    always @(Clk_S) #10 Clk_S <= ~Clk_S;
@@ -72,7 +72,7 @@ module txrx_t();
 	       $time, rx.rx_side.counter, TX_Ready, RX_Data, RX_Data_Valid, S_Data); 
        */
 
-      $monitor("%b %b %b %b %b %b", err_TX_Ready, err_RX_Ready, err_S_Data, err_RX_Data_Valid, err_RX_Data, err_ANY);
+      $monitor("%t %b %b %b %b",$time, err_TX_Ready, err_S_Data, err_RX_Data_Valid, err_ANY);
 
       Clk_S = 0;
       TX_Data = 55'd3;
