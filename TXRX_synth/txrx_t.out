@@ -1,0 +1,13 @@
+run -all
+# Lowering Rst_N
+#                    0 x x x x
+#                 1000 0 x 0 x
+#                 1000 0 0 0 0
+# Lowering TX_Data_Valid.
+# Raising TX_Data_Valid.
+# TX_Data: 00000000000003	 RX_Data: 00000000000003
+# Raising TX_Data_Valid.
+# TX_Data: 0b771d6ee3addd	 RX_Data: 0b771d6ee3addd
+# Raising TX_Data_Valid.
+# Resetting during transmission.
+# Break in Module txrx_t at /filespace/people/m/mstarr/sandbox/551_token_based_router/TXRX_synth/txrx_t.v line 182
