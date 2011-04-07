@@ -62,7 +62,7 @@ module txrx_t();
    assign err_ANY = err_TX_Ready|err_S_Data|err_RX_Data_Valid|err_RX_Data;
    
    /* clock */
-   always @(Clk_S) #1 Clk_S <= ~Clk_S;
+   always @(Clk_S) #2 Clk_S <= ~Clk_S;
 
 
    initial begin
