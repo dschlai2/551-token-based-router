@@ -62,7 +62,7 @@ module txrx_t();
    assign err_ANY = err_TX_Ready|err_S_Data|err_RX_Data_Valid|err_RX_Data;
    
    /* clock */
-   always @(Clk_S) #10 Clk_S <= ~Clk_S;
+   always @(Clk_S) #1 Clk_S <= ~Clk_S;
 
 
    initial begin
@@ -81,7 +81,7 @@ module txrx_t();
 
       
       /* Testing Rst_n */
-      //$display("Lowering Rst_N");
+      $display("Lowering Rst_N");
       #1 Rst_n = 0;
       
       if (TX_Ready != 0) $display ("*** TX_Ready did not go to 0");
@@ -95,7 +95,7 @@ module txrx_t();
       /* Lowering TX_Data_Valid */
       $display("Lowering TX_Data_Valid.");
       TX_Data_Valid = 0;
-      #1000;
+      #10;
       if (TX_Ready != 1) $display("*** TX_Ready did not go to 1");
       #7000;
 
@@ -103,7 +103,7 @@ module txrx_t();
       /* Raising TX_Data_Valid */
       $display("Raising TX_Data_Valid.");
       TX_Data_Valid = 1;
-      #9000;
+      #900;
       TX_Data_Valid = 0;
       if (TX_Ready != 0) $display("*** TX_Ready did not go to 0 on transmit.");
 
@@ -115,7 +115,7 @@ module txrx_t();
 
       /* Raising RX_Ready */
       RX_Ready = 1;
-      #2000;
+      #7;
       if (RX_Data_Valid != 1) $display("*** RX_Data_Valid did not go to 1 after transmit.");
       $display ("TX_Data: %h\t RX_Data: %h",TX_Data, RX_Data);
 
@@ -127,7 +127,7 @@ module txrx_t();
       TX_Data = 55'b101101110_1110001110_101101110_1110001110_101101110_11101;
       RX_Ready = 0;
 
-      #1000;
+      #100;
       /* Raising TX_Data_Valid */
       $display("Raising TX_Data_Valid.");
       TX_Data_Valid = 1;
@@ -152,7 +152,7 @@ module txrx_t();
 
 
       
-      /* Sending a second packet */
+      /* Sending a third packet */
       TX_Data = 55'b101101110_1110001110_101101110_1110001110_101101110_11101;
       RX_Ready = 0;
 
