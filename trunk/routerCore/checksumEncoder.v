@@ -1,4 +1,4 @@
-module checksumEncoder(input [23:0] payload, output reg [27:0] out);
+module checksum_encoder(input [23:0] payload, output reg [27:0] out);
 
 	integer i;
 	reg [5:0] count;
