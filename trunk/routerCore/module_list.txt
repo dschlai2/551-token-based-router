@@ -6,3 +6,6 @@ module checksum_decoder(input [27:0] encoded, output checksum_err, output reg [2
 module threeOfSixEncoder(input [23:0] payload, output [47:0] out);
 
 module append_3of6(input A, B, C, output F, G, H);
+
+module buffer(input [54:0] new_value, input buffer_select, clk, rst, output reg [54:0] out);
+
