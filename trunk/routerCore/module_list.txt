@@ -1,0 +1,8 @@
+module checksum_encoder(input [23:0] payload, output reg [27:0] out);
+//Please note OUTPUT IS ONLY 28 BITS. PUT MSBs in top of 48 bit payload
+
+module checksum_decoder(input [27:0] encoded, output checksum_err, output reg [23:0] payload);
+
+module threeOfSixEncoder(input [23:0] payload, output [47:0] out);
+
+module append_3of6(input A, B, C, output F, G, H);
