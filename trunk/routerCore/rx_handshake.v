@@ -9,7 +9,7 @@
 
 module rx_handshake(RX_Data_Ready, RX_Data_Valid, rc_ready, rx_has_data, clk, rst_n);
    input RX_Data_Valid, rc_ready, clk, rst_n;
-   output RX_Data_Ready, rx_has_data;
+   output reg RX_Data_Ready, rx_has_data;
 
    parameter RST = 2'd0;
    parameter WAIT = 2'd1;
@@ -31,14 +31,14 @@ module rx_handshake(RX_Data_Ready, RX_Data_Valid, rc_ready, rx_has_data, clk, rs
    always @(*) begin
       case (state)
 	RST: begin
-	   if (RX_Data_Valid == 1'b1)  // on reset, wait for RX_Data_Valid to go to 0
+	   if (RX_Data_Valid)  // on reset, wait for RX_Data_Valid to go to 0
 	     next_state = RST;
 	   else
 	     next_state = WAIT;
 	end
 
 	WAIT: begin
-	   if (RX_Data_Valid == 1'b1 && rc_ready = 1'b1) // Keep RX_Data_Ready high while the core is not ready for a packet
+	   if (RX_Data_Valid & rc_ready) // Keep RX_Data_Ready high while the core is not ready for a packet
 	     next_state = HOLD;
 	   else
 	     next_state = WAIT;
