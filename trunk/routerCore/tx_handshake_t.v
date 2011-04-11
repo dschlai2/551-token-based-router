@@ -1,2 +1,2 @@
-module tx_handshake_t.v();
-   
+module tx_handshake_t();
+   reg rc_has_data, 
