@@ -4,6 +4,7 @@ integer i;
 reg [3:0] count;
 
 always@(*) begin
+	count = 4'b0;
 	for(i = 0; i < 6; i = i + 1) begin
 		count = count + in[i];
 	end
