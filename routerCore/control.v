@@ -39,7 +39,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, type, packe
 			state <= next_state;
 	end
 
-	always@(*)begin
+	always@(RX_Data, RX_has_data)begin
 		if(rx_has_data)begin
 			case(type)
 				TOKEN: begin 
