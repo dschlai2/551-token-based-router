@@ -44,7 +44,7 @@ buffer ever_versetile(.new_value(enc_to_buf),
 			.rst_n(Rst_n),
 			.out(buf_to_mux));
 
-control_logic main_control(.Clk_R(Clk_r),
+control_logic main_control(.Clk_R(Clk_R),
 			.Rst_n(Rst_n),
 			.rx_has_data(rx_has_data),	
 			.address(address),
