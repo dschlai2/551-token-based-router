@@ -10,7 +10,7 @@
 
 module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rst_n);
    input rc_has_data, TX_Data_Ready, clk, rst_n;
-   output tx_ready, TX_Data_Valid;
+   output reg tx_ready, TX_Data_Valid;
 
    parameter RST = 2'd0;
    parameter WAIT = 2'd1;

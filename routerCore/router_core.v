@@ -10,10 +10,10 @@ parameter[54:0] TOKEN = {3'b111, 52'b0};
 parameter[54:0] ACK = {3'b000, 52'b0};
 parameter[54:0] NACK = {3'b011, 52'b0};
 
-wire bad_decode, buffer_select, rx_has_data, rc_ready, tx_ready, rc_has_data
+wire bad_decode, buffer_select, rx_has_data, rc_ready, tx_ready, rc_has_data;
 wire[3:0] address;
-wire[2:0] data_type, tx_data_select
-wire[54:0] enc_to_buf, buf_to_mux
+wire[2:0] data_type, tx_data_select;
+wire[54:0] enc_to_buf, buf_to_mux;
 
 rx_handshake rHandshake(.rc_ready(rc_ready),
 			.rx_has_data(rx_has_data),
