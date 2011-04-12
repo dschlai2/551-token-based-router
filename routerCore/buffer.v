@@ -4,9 +4,9 @@ module buffer(new_value, buffer_select, clk, rst, out);
     input clk, rst, buffer_select;
     output reg [54:0] out;
     
-    always@(posedge clk, posedge rst)begin
+    always@(posedge clk, negedge rst)begin
         // Reset
-        if(rst)begin
+        if(~rst)begin
            out <= 55'b0;
         end
         
