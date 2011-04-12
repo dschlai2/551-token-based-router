@@ -8,23 +8,30 @@
  
  **/
 
-module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rst_n);
+module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rst_n, data_to_tx, TX_Data);
    input rc_has_data, TX_Data_Ready, clk, rst_n;
    output reg tx_ready, TX_Data_Valid;
-
+   output reg [54:0] TX_Data;
+   input [54:0] data_to_tx;
+   
    parameter RST = 2'd0;
    parameter WAIT = 2'd1;
    parameter TRANSFER = 2'd2;
    parameter ERR = 2'd3;
 
+   reg [54:0] 	    next_TX_Data;
    reg [1:0] state, next_state;
+
 
    /* sequential logic */
    always @(posedge clk, negedge rst_n) begin
-      if (~rst_n)
-	state <= RST;
-      else
-	state <= next_state;
+      if (~rst_n) begin
+	 state <= RST;
+	 TX_Data <= 55'b0;
+      end else begin
+	 state <= next_state;
+	 TX_Data <= next_TX_Data;
+      end
    end
 
    /* output logic */
@@ -48,6 +55,7 @@ module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rs
 	default: begin
 	   tx_ready = 1'bx;
 	   TX_Data_Valid = 1'bx;
+	   next_TX_Data = 55'b1;
 	end
       endcase // case (state)
    end // always @ (state)
@@ -56,6 +64,7 @@ module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rs
    always @(*) begin
       case (state)
 	RST: begin
+	   next_TX_Data = data_to_tx;
 	   if (TX_Data_Ready)  // wait for TX_Data_Ready to go high before raising ready sig
 	     next_state = WAIT;
 	   else
@@ -63,13 +72,16 @@ module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rs
 	end
 	
 	WAIT: begin
-	   if (rc_has_data)
+	   next_TX_Data = data_to_tx;
+	   if (rc_has_data) begin
 	     next_state = TRANSFER;
-	   else
+	   end else begin
 	     next_state = WAIT;
+	   end
 	end
 
 	TRANSFER: begin
+	   next_TX_Data = TX_Data;
 	   if (TX_Data_Ready)
 	     next_state = TRANSFER;
 	   else
@@ -78,6 +90,7 @@ module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rs
 
 	default: begin
 	   next_state = ERR;
+	   next_TX_Data = 55'bx;
 	end
       endcase // case (state)
    end // always @ (*)
