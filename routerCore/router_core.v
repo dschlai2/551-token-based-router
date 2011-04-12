@@ -13,7 +13,8 @@ parameter[54:0] NACK = {3'b011, 52'b0};
 wire bad_decode, buffer_select, rx_has_data, rc_ready, tx_ready, rc_has_data;
 wire[3:0] address;
 wire[2:0] data_type, tx_data_select;
-wire[54:0] enc_to_buf, buf_to_mux;
+wire[54:0] enc_to_buf, buf_to_mux, data_to_tx;
+   
 
 rx_handshake rHandshake(.rc_ready(rc_ready),
 			.rx_has_data(rx_has_data),
@@ -27,7 +28,9 @@ tx_handshake tHandshake(.tx_ready(tx_ready),
 			.TX_Data_Valid(TX_Data_Valid),
 			.TX_Data_Ready(TX_Data_Ready),
 			.clk(Clk_R),
-			.rst_n(Rst_n));
+			.rst_n(Rst_n),
+			.data_to_tx(data_to_tx),
+			.TX_Data(TX_Data));
 
 decode_logic dec_logic(.RX_Data(RX_Data),
 			.addr(address),
@@ -65,6 +68,6 @@ master_mux masterMux(.buffer(buf_to_mux),
 			.ack(ACK),
 			.nack(NACK),
 			.TX_data_select(tx_data_select),
-			.out(TX_Data));
+			.out(data_to_tx));
 
 endmodule

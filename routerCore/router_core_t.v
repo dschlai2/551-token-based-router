@@ -8,6 +8,13 @@ module router_core_t();
    wire [54:0] TX_Data;
    wire [23:0] Packet_To_Node;
 
+   
+   /* Types */
+   parameter[2:0] TOKEN =  3'b111;
+   parameter[2:0] ACK =    3'b000;
+   parameter[2:0] NACK =   3'b011;
+   parameter[2:0] DATA_C = 3'b010;
+   parameter[2:0] DATA_3 = 3'b001;
 
    /* router core control logic states */
    parameter ERR_STATE =         4'd0;   
@@ -71,6 +78,11 @@ module router_core_t();
       $monitor("%t: core_load_ack:%b packet_to_node_valid:%b rx_data_ready:%b tx_data_valid:%b TX_Data:%h Packet_To_Node:%h",
 	       $time, Core_Load_Ack, Packet_To_Node_Valid, RX_Data_Ready, TX_Data_Valid, TX_Data, Packet_To_Node);
 
+
+      $monitor("%t: TX_Data:%h, input to txhandshake: %h", $time, TX_Data, rc.data_to_tx);
+      
+
+      ///* Testing reset as master, and entering send_token state *///
       
       /* Initialize variables */
       RX_Data = 55'b0;
@@ -93,7 +105,7 @@ module router_core_t();
       /* Turn off reset */
       #2;
       Rst_n = 1'b1;
-      #3;
+      #2;
 
       /* Router address is 0, so we should be in check_node */
       if (rc.main_control.state != CHECK_NODE) $display("Did not enter Check_Node after reset as master.");
@@ -105,9 +117,21 @@ module router_core_t();
       #2;
       /* Raising TX_Data_Ready should allow state to enter send_token */
       TX_Data_Ready = 1'b1;
-      #2;
+      #6;
+      if (TX_Data != {TOKEN,52'b0}) $display ("Token not put on the TX_Data line.");
       if (rc.main_control.state != LISTEN_NO_TOKEN) $display("Did not enter listen_no_token after raising tx_data_ready.");
 
+      #20;
+      ///*  Testing     */// 
+      RX_Data = 55'b0;
+      Rst_n = 1'b0;
+      RX_Data_Valid = 1'b0;
+      TX_Data_Ready = 1'b0;
+      Packet_From_Node_Valid = 1'b0;
+      Packet_From_Node = 29'b0;
+
+      
+      
       $stop;
 
 
