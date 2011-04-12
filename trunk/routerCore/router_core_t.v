@@ -79,9 +79,6 @@ module router_core_t();
 	       $time, Core_Load_Ack, Packet_To_Node_Valid, RX_Data_Ready, TX_Data_Valid, TX_Data, Packet_To_Node);
 
 
-      $monitor("%t: TX_Data:%h, input to txhandshake: %h", $time, TX_Data, rc.data_to_tx);
-      
-
       ///* Testing reset as master, and entering send_token state *///
       
       /* Initialize variables */
@@ -122,7 +119,11 @@ module router_core_t();
       if (rc.main_control.state != LISTEN_NO_TOKEN) $display("Did not enter listen_no_token after raising tx_data_ready.");
 
       #20;
-      ///*  Testing     */// 
+
+
+
+      
+      ///*  Testing packet sending from processing node   */// 
       RX_Data = 55'b0;
       Rst_n = 1'b0;
       RX_Data_Valid = 1'b0;
@@ -130,6 +131,34 @@ module router_core_t();
       Packet_From_Node_Valid = 1'b0;
       Packet_From_Node = 29'b0;
 
+
+      #2;
+      Rst_n = 1'b1; // turn off reset
+      Packet_From_Node = 29'h123123;  // put a packet on the node line
+      Packet_From_Node_Valid = 1'b1;  // we have a packet in the node
+      #4; // 2 ticks for check, 2 for check_node
+
+      /* Packet_From_Node_Valid is high, so we should transition into Encode */
+      if (rc.main_control.state != ENCODE) $display("Did not move to encode when data was on processor node line.");
+
+      #80;  // Waiting a long time for TX_Data_Ready should not cause change
+      if (rc.main_control.state != ENCODE) $display("Did not stay in encode while waiting for tx unit.");
+      #2;
+      TX_Data_Ready = 1'b1; // ready to transfer packets
+      #4;
+
+      if (rc.main_control.state != SEND_TX) $display("Did not begin packet transmission after sending ready signal.");
+      if (TX_Data_Valid != 1) $display ("TX_Data_Valid is not 1 even though data is ready for transmission.");
+
+      #20;
+      // TX_Data_Valid should stay high until we lower TX_Data_Ready
+      TX_Data_Ready = 1'b0;
+      #2;
+      if (TX_Data_Valid != 0) $display ("TX_Data_Valid is not 0 after dropping TX_Data_Ready.");
+      #2;      
+      
+      
+      
       
       
       $stop;
