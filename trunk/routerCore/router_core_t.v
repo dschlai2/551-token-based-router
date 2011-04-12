@@ -23,6 +23,8 @@ module router_core_t();
    parameter SEND_NODE	=	4'd10;
    parameter SEND_NACK  =       4'd11;
    
+   /* Override router address */
+   defparam rc.main_control.OUR_ADDRESS = 4'b0;
    
    router_core rc(.RX_Data(RX_Data),
 		  .Clk_R(Clk_R),
@@ -45,8 +47,8 @@ module router_core_t();
    end
 
    /* Monitor state changes in rc */
-   always @(rc.control_logic.state) begin
-      case (rc.control_logic.state)
+   always @(rc.main_control.state) begin
+      case (rc.main_control.state)
 	ERR_STATE: $display("state:: err_state");
 	CHECK_IF_MASTER: $display("state:: check_if_master");
 	SEND_TOKEN: $display("state:: send_token");
@@ -59,14 +61,14 @@ module router_core_t();
 	CHECK_ADDRESS: $display("state:: check_address");
 	SEND_NODE: $display("state:: send_node");
 	SEND_NACK: $display("state:: send_nack");
-      endcase // case (rc.control_logic.state)
-   end // always @ (rc.control_logic.state)
+      endcase // case (rc.main_control.state)
+   end // always @ (rc.main_control.state)
       
    
    initial begin
 
       /* Monitor rc outputs */
-      $monitor("%t: core_load_ack:%b packet_to_node_valid:%b rx_data_ready:%b tx_data_valid:%b TX_Data:%b Packet_To_Node:%b",
+      $monitor("%t: core_load_ack:%b packet_to_node_valid:%b rx_data_ready:%b tx_data_valid:%b TX_Data:%h Packet_To_Node:%h",
 	       $time, Core_Load_Ack, Packet_To_Node_Valid, RX_Data_Ready, TX_Data_Valid, TX_Data, Packet_To_Node);
 
       
@@ -79,7 +81,7 @@ module router_core_t();
       Packet_From_Node_Valid = 1'b0;
       Packet_From_Node = 29'b0;
       
-      #1;
+      #2;
       
       /* Test reset values */
       if (TX_Data_Valid != 1'b0) $display("TX_Data_Valid is not 0 on reset.");
@@ -89,22 +91,22 @@ module router_core_t();
       if (Core_Load_Ack != 1'b0) $display("Core_Load_Ack is not 0 on reset.");
 
       /* Turn off reset */
-      #1;
+      #2;
       Rst_n = 1'b1;
-      #1;
+      #3;
 
       /* Router address is 0, so we should be in check_node */
-      if (rc.control_logic.state != CHECK_NODE) $display("Did not enter Check_Node after reset as master.");
+      if (rc.main_control.state != CHECK_NODE) $display("Did not enter Check_Node after reset as master.");
 
       /* Packet_From_Node_Valid is 0, but TX_Data_Ready is 0, so we stay in this state */
-      #5;
-      if (rc.control_logic.state != CHECK_NODE) $display("Did not stay in state Check_Node while TX_Data_Ready is low.");
+      #4;
+      if (rc.main_control.state != CHECK_NODE) $display("Did not stay in state Check_Node while TX_Data_Ready is low.");
 
-      #1;
+      #2;
       /* Raising TX_Data_Ready should allow state to enter send_token */
       TX_Data_Ready = 1'b1;
-      #1;
-      if (rc.control_logic.state != LISTEN_NO_TOKEN) $display("Did not enter listen_no_token after raising tx_data_ready.");
+      #2;
+      if (rc.main_control.state != LISTEN_NO_TOKEN) $display("Did not enter listen_no_token after raising tx_data_ready.");
 
       $stop;
 
