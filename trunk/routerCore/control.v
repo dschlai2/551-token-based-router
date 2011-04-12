@@ -1,4 +1,4 @@
-module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, packet_to_node_valid, 
+module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, Packet_To_Node_Valid, 
 			Core_Load_Ack, Packet_From_Node_Valid, buffer_select, 
 			tx_data_select, rc_ready, tx_ready, rc_has_data);
 
@@ -19,30 +19,29 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
    
    /* states */
    parameter ERR_STATE =         4'd0;   
-   parameter CHECK_IF_MASTER 	4'd1;
-   parameter SEND_TOKEN		4'd2;
-   parameter CHECK_NODE 	4'd3;
-   parameter ENCODE 		4'd4;
-   parameter SEND_TX 		4'd5;
-   parameter LISTEN_WITH_TOKEN 	4'd6;
-   parameter LISTEN_NO_TOKEN 	4'd7;
-   parameter FORWARD		4'd8;
-   parameter CHECK_ADDRESS      4'd9;
-   parameter SEND_NODE		4'd10;
-   parameter SEND_NACK          4'd11;
+   parameter CHECK_IF_MASTER =	4'd1;
+   parameter SEND_TOKEN	=	4'd2;
+   parameter CHECK_NODE =	4'd3;
+   parameter ENCODE =		4'd4;
+   parameter SEND_TX =		4'd5;
+   parameter LISTEN_WITH_TOKEN=	4'd6;
+   parameter LISTEN_NO_TOKEN =	4'd7;
+   parameter FORWARD =		4'd8;
+   parameter CHECK_ADDRESS =    4'd9;
+   parameter SEND_NODE	=	4'd10;
+   parameter SEND_NACK  =       4'd11;
    
-   input rx_has_data, bad_decode, Packet_From_Node_Valid, tx_ready, clk, rst;
+   input rx_has_data, bad_decode, Packet_From_Node_Valid, tx_ready, Clk_R, Rst_n;
    input [3:0] address;
    input [2:0] data_type;
    
-   output      rc_ready, Packet_To_Node_Valid, Core_Load_Ack, buffer_select, rc_has_data;
-   output [1:0] tx_data_select;
+   output reg  rc_ready, Packet_To_Node_Valid, Core_Load_Ack, buffer_select, rc_has_data;
+   output reg [2:0] tx_data_select;
    
    reg [3:0] 	state, next_state;
-   wire 	token, ack, nack, check, three;
    
-   always@(posedge Clk_R negedge Rst_n)begin
-      if(!Rst_N)
+   always@(posedge Clk_R, negedge Rst_n)begin
+      if(!Rst_n)
 	state <= CHECK_IF_MASTER;
       else
 	state <= next_state;
@@ -67,8 +66,10 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
 		next_state = CHECK_NODE;
 	   end
 	end
-	SEND_TOKEN:
+	SEND_TOKEN: begin
 	  next_state = LISTEN_NO_TOKEN;
+	end
+	
 	ENCODE: begin
 	   if(tx_ready)
 	     next_state = SEND_TX;
@@ -81,13 +82,13 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
 	
 	LISTEN_WITH_TOKEN:
 	  if(rx_has_data) begin
-	     if(data_type == nack) 
+	     if(data_type == NACK) 
 	       next_state = ENCODE;
 	     else 
 	       next_state = CHECK_NODE;
 	  end
 	  else
-	    next_state = LISTEN_WITH_T0KEN;
+	    next_state = LISTEN_WITH_TOKEN;
 
 	LISTEN_NO_TOKEN:
 	  if (~rx_has_data)
@@ -126,7 +127,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
 
    always @(state) begin
       case (state)
-	CHECK_MASTER: begin
+	CHECK_IF_MASTER: begin
 	   rc_ready = 1'b0;
 	   Packet_To_Node_Valid = 1'b0;
 	   Core_Load_Ack= 1'b0;
