@@ -105,7 +105,14 @@ module router_core_t();
       TX_Data_Ready = 1'b1;
       #1;
       if (rc.control_logic.state != LISTEN_NO_TOKEN) $display("Did not enter listen_no_token after raising tx_data_ready.");
+
+      $stop;
+
+
       
+   end // initial begin
+endmodule // router_core_t
+
 
 	       
 
