@@ -1,12 +1,12 @@
-module buffer(new_value, buffer_select, clk, rst, out);
+module buffer(new_value, buffer_select, clk, rst_n, out);
     
     input [54:0] new_value;
-    input clk, rst, buffer_select;
+    input clk, rst_n, buffer_select;
     output reg [54:0] out;
     
-    always@(posedge clk, negedge rst)begin
+    always@(posedge clk, negedge rst_n)begin
         // Reset
-        if(~rst)begin
+        if(~rst_n)begin
            out <= 55'b0;
         end
         
