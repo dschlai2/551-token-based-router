@@ -92,7 +92,7 @@ module txrx_and_core_tb();
 	Rst_n = 1'b1;
 	#10;
 	$display("Attempting to send data...");
-	if(rc.control_logic.state != LISTEN_NO_TOKEN)begin
+	if(rc.main_control.state != LISTEN_NO_TOKEN)begin
 		$display("Problem: Not in state LISTEN_NO_TOKEN");
 	end
 	for(i = 0; i < 55; i = i + 1)begin
