@@ -18,7 +18,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
    parameter [2:0] tx_NEW = 3'd4;
    
    /* states */
-     parameter ERR_STATE =         4'd0;   
+   parameter ERR_STATE =         4'd0;   
    parameter CHECK_IF_MASTER 	4'd1;
    parameter SEND_TOKEN		4'd2;
    parameter CHECK_NODE 	4'd3;
@@ -190,7 +190,53 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
 	end
 
 	CHECK_ADDRESS: begin
-	   rc_read = 1'b
+	   rc_ready = 1'b0;
+	   Packet_To_Node_Valid = 1'b0;
+	   Core_Load_Ack = 1'b0;
+	   buffer_select = 1'bx;
+	   tx_data_select = 3'bx;
+	   rc_has_data = 1'b0;
+	end
+
+	FORWARD: begin
+	   rc_ready = 1'b0;
+	   Packet_To_Node_Valid = 1'b0;
+	   Core_Load_Ack = 1'b0;
+	   buffer_select = 1'bx;
+	   tx_data_select = tx_FORWARD;
+	   rc_has_data = 1'b1;
+	end
+
+	SEND_NACK: begin
+	   rc_ready = 1'b0;
+	   Packet_To_Node_Valid = 1'b0;
+	   Core_Load_Ack = 1'b0;
+	   buffer_select = 1'bx;
+	   tx_data_select = tx_NACK;
+	   rc_has_data = 1'b1;
+	end
+
+	SEND_NODE: begin
+	   rc_ready = 1'b0;
+	   Packet_To_Node_Valid = 1'b1;
+	   Core_Load_Ack = 1'b0;
+	   buffer_select = 1'bx;
+	   tx_data_select = tx_ACK;
+	   rc_has_data = 1'b1;
+	end
+
+	default: begin
+	   rc_ready = 1'bx;
+	   Packet_To_Node_Valid = 1'bx;
+	   Core_Load_Ack = 1'bx;
+	   buffer_select = 1'bx;
+	   tx_data_select = tx_ACK;
+	   rc_has_data = 1'bx;
+	end
+      endcase // case (state)
+   end // always @ (state)
+endmodule // control_logic
+
 	   
 	  
 	
