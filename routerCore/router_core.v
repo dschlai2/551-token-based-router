@@ -6,22 +6,24 @@ module router_core(input [54:0] RX_Data,
 		output [54:0] TX_Data,
 		output [23:0] Packet_To_Node);
 
-parameter[54:0] TOKEN = {3'b111, 52'b0};
-parameter[54:0] ACK = {3'b000, 52'b0};
-parameter[54:0] NACK = {3'b011, 52'b0};
-
-wire bad_decode, buffer_select, rx_has_data, rc_ready, tx_ready, rc_has_data;
-wire[3:0] address;
-wire[2:0] data_type, tx_data_select;
-wire[54:0] enc_to_buf, buf_to_mux, data_to_tx;
+   parameter[54:0] TOKEN = {3'b111, 52'b0};
+   parameter[54:0] ACK = {3'b000, 52'b0};
+   parameter[54:0] NACK = {3'b011, 52'b0};
+   parameter[3:0] R_ADDR = 4'b0000;
+   defparam main_control.OUR_ADDRESS = R_ADDR;
+   
+   wire 		      bad_decode, buffer_select, rx_has_data, rc_ready, tx_ready, rc_has_data;
+   wire [3:0] 		      address;
+   wire [2:0] 		      data_type, tx_data_select;
+   wire [54:0] 		      enc_to_buf, buf_to_mux, data_to_tx;
    
 
-rx_handshake rHandshake(.rc_ready(rc_ready),
-			.rx_has_data(rx_has_data),
-			.RX_Data_Ready(RX_Data_Ready),
-			.RX_Data_Valid(RX_Data_Valid),
-			.clk(Clk_R),
-			.rst_n(Rst_n));
+   rx_handshake rHandshake(.rc_ready(rc_ready),
+			   .rx_has_data(rx_has_data),
+			   .RX_Data_Ready(RX_Data_Ready),
+			   .RX_Data_Valid(RX_Data_Valid),
+			   .clk(Clk_R),
+			   .rst_n(Rst_n));
 
 tx_handshake tHandshake(.tx_ready(tx_ready),
 			.rc_has_data(rc_has_data),
