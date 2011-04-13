@@ -22,8 +22,8 @@ module txrx_and_core_tb();
 
    // Master input output wires (From other cores)
    reg Clk_S, Clk_R, Rst_n;
-   wire S_Data_in;
-   reg [54:0] data_packet_to_send;
+   reg S_Data_in;
+   reg [61:0] data_packet_to_send;
    wire S_Data_out;
 
    // Wires to and from "Processor Node"
@@ -68,7 +68,7 @@ module txrx_and_core_tb();
    /* Generate TX / RX clock signal */
    always begin
       Clk_S = ~Clk_S;
-      #1;
+      #2;
    end
 
    /* Generate Router Core clock signal */
@@ -77,29 +77,29 @@ module txrx_and_core_tb();
 	#4;
    end
 
-   assign S_Data_in = data_packet_to_send[54];
+   
 
    initial begin
 	// Send a NACK
-	data_packet_to_send = 55'b0111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_111;
+	data_packet_to_send = 61'b01_1111_0111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_111;
    end
 
    initial begin
+	Clk_S = 0;
+	Clk_R = 0;
 	$display("Resetting...");
-	$monitor("%t: S_Data_in: %d         S_Data_out: %d", $time, S_Data_in, S_Data_out); 
+	$monitor("%t: Clk_S: %b S_Data_in: %b  S_Data_out: %b RX_Data_Valid: %b", $time,Clk_S, S_Data_in, S_Data_out, RX.RX_Data_Valid); 
 	Rst_n = 1'b0;
 	#10;
 	Rst_n = 1'b1;
-	#10;
-	$display("Attempting to send data...");
-	if(rc.main_control.state != LISTEN_NO_TOKEN)begin
-		$display("Problem: Not in state LISTEN_NO_TOKEN");
-	end
-	for(i = 0; i < 55; i = i + 1)begin
+	for(i = 0; i < 61; i = i + 1)begin
+		S_Data_in = data_packet_to_send[60];
 		data_packet_to_send = data_packet_to_send << 1;
 		#2;
 	end
-	#100;
+	S_Data_in = 1'b0;
+	#500;
+	$stop;
    end // initial begin
 endmodule // router_core_t
 

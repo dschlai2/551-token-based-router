@@ -67,8 +67,8 @@ module router_core_testing123();
    initial begin
 
       /* Monitor rc outputs */
-      $monitor("%t: core_load_ack:%b packet_to_node_valid:%b rx_data_ready:%b tx_data_valid:%b TX_Data:%b Packet_To_Node:%b",
-	       $time, Core_Load_Ack, Packet_To_Node_Valid, RX_Data_Ready, TX_Data_Valid, TX_Data, Packet_To_Node);
+      $monitor("%t: core_load_ack:%b packet_to_node_valid:%b rx_data_ready:%b tx_data_valid:%b TX_Data:%b Packet_To_Node:%b State: %d", 
+	       $time, Core_Load_Ack, Packet_To_Node_Valid, RX_Data_Ready, TX_Data_Valid, TX_Data, Packet_To_Node, rc.main_control.state);
 
       
       /* Initialize variables */
@@ -76,7 +76,7 @@ module router_core_testing123();
       Clk_R = 1'b0;
       Rst_n = 1'b0;
       RX_Data_Valid = 1'b0;
-      TX_Data_Ready = 1'b0;
+      TX_Data_Ready = 1'b1;
       Packet_From_Node_Valid = 1'b0;
       Packet_From_Node = 29'b0;
       
@@ -101,7 +101,8 @@ module router_core_testing123();
       #5;
       if (rc.main_control.state != LISTEN_NO_TOKEN) $display("Did not stay in state Check_Node while RX_Data_Ready is low.");
 
-      #1;
+ 
+ 	#1;
 
       if(rc.rHandshake.RX_Data_Ready != 1'b1) $display("Core should be ready for data but isnt");
 
@@ -139,6 +140,12 @@ module router_core_testing123();
 	$display("Sending nack to another address");
         RX_Data_Valid = 1'b1;
         force RX_Data = {3'b011,4'b0000,48'b0};
+	 #1;
+     	 Rst_n = 1'b0;
+	$display("Resetting");
+	 #1;
+     	 Rst_n = 1'b1;
+	
 	#5;
 	if(rc.rHandshake.RX_Data_Ready != 1'b0) $display("Core should not be ready for data at this point");
 	RX_Data_Valid = 1'b0;	
@@ -153,14 +160,89 @@ module router_core_testing123();
 	RX_Data_Valid = 1'b0;	
 	#40;
 
+	$display("Sending poorly coded 30f6 packet to our address");
+        RX_Data_Valid = 1'b1;
+        force RX_Data = {3'b001,4'b0001,48'h123456789abc};
+	#5;
+	if(rc.rHandshake.RX_Data_Ready != 1'b0) $display("Core should not be ready for data at this point");
+	RX_Data_Valid = 1'b0;	
+	#40;
+
+	
+	$display("Sending correctly coded 30f6 packet to another address");
+        RX_Data_Valid = 1'b1;
+        force RX_Data = {3'b001,4'b0000,48'b100110111000110100000111010110110100101100100110};
+	#5;
+	if(rc.rHandshake.RX_Data_Ready != 1'b0) $display("Core should not be ready for data at this point");
+	RX_Data_Valid = 1'b0;	
+	#40;
+
+	TX_Data_Ready = 1'b0;
+
 	#45;
-	$display("Sending token");
+	$display("Sending token: Should be check_node state");
         RX_Data_Valid = 1'b1;
         force RX_Data = {3'b111,4'b0001,48'h123456789abc};
 	#5;
 	if(rc.rHandshake.RX_Data_Ready != 1'b0) $display("Core should not be ready for data at this point");
 	RX_Data_Valid = 1'b0;	
 	#40;
+
+	$display("Sending payload from core to get checksum encoding");
+	force Packet_From_Node = 29'b10000100111110000010110101100;
+	#5
+	force Packet_From_Node_Valid = 1'b1;
+	#5
+	force TX_Data_Ready = 1'b1;
+	#5
+	force TX_Data_Ready = 1'b0;
+
+	#45;
+	$display("Sending ack packet for our address");
+        RX_Data_Valid = 1'b1;
+        force RX_Data = {3'b000,4'b0001,48'b0};
+	#5;
+	if(rc.rHandshake.RX_Data_Ready != 1'b0) $display("Core should not be ready for data at this point");
+	RX_Data_Valid = 1'b0;	
+
+	$display("Sending payload from core to get 3of6 encoding");
+	force Packet_From_Node = 29'b10001100111110000010110101100;
+	#5
+	force Packet_From_Node_Valid = 1'b1;
+	#5
+	force Packet_From_Node_Valid = 1'b0;
+	#5
+	force TX_Data_Ready = 1'b1;
+	#5
+	force TX_Data_Ready = 1'b0;
+
+
+
+
+	#45;
+	$display("Sending nack packet for our address");
+        RX_Data_Valid = 1'b1;
+        force RX_Data = {3'b011,4'b0001,48'b0};
+	#5;
+	if(rc.rHandshake.RX_Data_Ready != 1'b0) $display("Core should not be ready for data at this point");
+	RX_Data_Valid = 1'b0;	
+
+	#5
+	force TX_Data_Ready = 1'b1;
+	#5
+	force TX_Data_Ready = 1'b0;
+	#5
+	force TX_Data_Ready = 1'b1;
+
+	#45
+	$display("Sending ack packet for our address");
+        RX_Data_Valid = 1'b1;
+        force RX_Data = {3'b000,4'b0001,48'b0};
+	#5;
+	if(rc.rHandshake.RX_Data_Ready != 1'b0) $display("Core should not be ready for data at this point");
+	RX_Data_Valid = 1'b0;	
+
+	#45
 	
       $stop;
 
