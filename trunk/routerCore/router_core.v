@@ -18,7 +18,7 @@ module router_core(input [54:0] RX_Data,
    wire [54:0] 		      enc_to_buf, buf_to_mux, data_to_tx;
    
 
-   rx_handshake rHandshake(.rc_ready(rc_ready),
+rx_handshake rHandshake(.rc_ready(rc_ready),
 			   .rx_has_data(rx_has_data),
 			   .RX_Data_Ready(RX_Data_Ready),
 			   .RX_Data_Valid(RX_Data_Valid),

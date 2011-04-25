@@ -1,7 +1,5 @@
 module master_mux(input [54:0] token, nack, ack, buffer, data,input [2:0] TX_data_select, output reg [54:0] out);
 
-
-
 always@(TX_data_select) begin 
 	case(TX_data_select)
 

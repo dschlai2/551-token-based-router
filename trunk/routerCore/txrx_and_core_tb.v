@@ -1,10 +1,7 @@
-// HOW TO USE: Change "data_packet_to_send" to whatever 55 bit packet you want to send.
-// Not guaranteed to work.
-
 module txrx_and_core_tb();
 
    /* router core control logic states */
-   parameter ERR_STATE =         4'd0;   
+   parameter ERR_STATE =        4'd0;   
    parameter CHECK_IF_MASTER =	4'd1;
    parameter SEND_TOKEN	=	4'd2;
    parameter CHECK_NODE =	4'd3;
@@ -17,53 +14,116 @@ module txrx_and_core_tb();
    parameter SEND_NODE	=	4'd10;
    parameter SEND_NACK  =       4'd11;
 
-   /* Override router address */
-   //defparam rc.main_control.OUR_ADDRESS = 4'b0;
-
-   // Master input output wires (From other cores)
+   // Clockz
    reg Clk_S, Clk_R, Rst_n;
-   reg S_Data_in;
-   reg [61:0] data_packet_to_send;
-   wire S_Data_out;
 
-   // Wires to and from "Processor Node"
-   wire Core_Load_Ack, Packet_From_Node_Valid, Packet_To_Node_Valid;
-   wire [23:0] Packet_To_Node;
-   wire [28:0] Packet_From_Node;
+   // Wires to and from processor nodes
+   wire [2:0] Core_Load_Ack, Packet_From_Node_Valid, Packet_To_Node_Valid;
+   wire [23:0] Packet_To_Node0, Packet_To_Node1, Packet_To_Node2;
+   wire [28:0] Packet_From_Node0, Packet_From_Node1, Packet_From_Node2;
 
    // Wires between modules
-   wire TX_Data_Ready, TX_Data_Valid, RX_Data_Ready, RX_Data_Valid;
-   wire [54:0] RX_Data, TX_Data;
+   wire s_data0_1, s_data1_2, s_data2_0;
+   wire [2:0] TX_Data_Ready;
+   wire [2:0] TX_Data_Valid;
+   wire [2:0] RX_Data_Ready;
+   wire [2:0] RX_Data_Valid;
+   wire [54:0] RX_Data0, RX_Data1, RX_Data2;
+   wire [54:0] TX_Data0, TX_Data1, TX_Data2;
 
    integer i;
 
-   router_core rc(.RX_Data(RX_Data),
+   // Router core address param overrides
+   defparam rc0.R_ADDR = 4'b0000; // Master
+   defparam rc1.R_ADDR = 4'b0001;
+   defparam rc2.R_ADDR = 4'b0010;
+
+   // Router Base 0
+   router_core rc0(.RX_Data(RX_Data0),
 		  .Clk_R(Clk_R),
 		  .Rst_n(Rst_n),
-		  .RX_Data_Valid(RX_Data_Valid),
-		  .TX_Data_Ready(TX_Data_Ready),
-		  .Packet_From_Node_Valid(Packet_From_Node_Valid),
-		  .Packet_From_Node(Packet_From_Node),
-		  .Core_Load_Ack(Core_Load_Ack),
-		  .Packet_To_Node_Valid(Packet_To_Node_Valid),
-		  .RX_Data_Ready(RX_Data_Ready),
-		  .TX_Data_Valid(TX_Data_Valid),
-		  .TX_Data(TX_Data),
-		  .Packet_To_Node(Packet_To_Node));
+		  .RX_Data_Valid(RX_Data_Valid[0]),
+		  .TX_Data_Ready(TX_Data_Ready[0]),
+		  .Packet_From_Node_Valid(Packet_From_Node_Valid[0]),
+		  .Packet_From_Node(Packet_From_Node0),
+		  .Core_Load_Ack(Core_Load_Ack[0]),
+		  .Packet_To_Node_Valid(Packet_To_Node_Valid[0]),
+		  .RX_Data_Ready(RX_Data_Ready[0]),
+		  .TX_Data_Valid(TX_Data_Valid[0]),
+		  .TX_Data(TX_Data0),
+		  .Packet_To_Node(Packet_To_Node0));
 
-   transmitter TX(.TX_Data(TX_Data),
-		.TX_Data_Valid(TX_Data_Valid),
+   transmitter TX0(.TX_Data(TX_Data0),
+		.TX_Data_Valid(TX_Data_Valid[0]),
 		.Clk_S(Clk_S),
 		.Rst_n(Rst_n),
-		.TX_Ready(TX_Data_Ready),
-		.S_Data(S_Data_out));
+		.TX_Ready(TX_Data_Ready[0]),
+		.S_Data(s_data0_1));
 
-   receiver RX(.RX_Ready(RX_Data_Ready),
+   receiver RX0(.RX_Ready(RX_Data_Ready[0]),
 		.Clk_S(Clk_S),
 		.Rst_n(Rst_n),
-		.S_Data(S_Data_in),
-		.RX_Data_Valid(RX_Data_Valid),
-		.RX_Data(RX_Data));
+		.S_Data(s_data2_0),
+		.RX_Data_Valid(RX_Data_Valid[0]),
+		.RX_Data(RX_Data0));
+   
+   // Router Base 1
+   router_core rc1(.RX_Data(RX_Data1),
+		  .Clk_R(Clk_R),
+		  .Rst_n(Rst_n),
+		  .RX_Data_Valid(RX_Data_Valid[1]),
+		  .TX_Data_Ready(TX_Data_Ready[1]),
+		  .Packet_From_Node_Valid(Packet_From_Node_Valid[1]),
+		  .Packet_From_Node(Packet_From_Node1),
+		  .Core_Load_Ack(Core_Load_Ack[1]),
+		  .Packet_To_Node_Valid(Packet_To_Node_Valid[1]),
+		  .RX_Data_Ready(RX_Data_Ready[1]),
+		  .TX_Data_Valid(TX_Data_Valid[1]),
+		  .TX_Data(TX_Data1),
+		  .Packet_To_Node(Packet_To_Node1));
+
+   transmitter TX1(.TX_Data(TX_Data1),
+		.TX_Data_Valid(TX_Data_Valid[1]),
+		.Clk_S(Clk_S),
+		.Rst_n(Rst_n),
+		.TX_Ready(TX_Data_Ready[1]),
+		.S_Data(s_data1_2));
+
+   receiver RX1(.RX_Ready(RX_Data_Ready[1]),
+		.Clk_S(Clk_S),
+		.Rst_n(Rst_n),
+		.S_Data(s_data0_1),
+		.RX_Data_Valid(RX_Data_Valid[1]),
+		.RX_Data(RX_Data1));
+
+   // Router Base 2
+   router_core rc2(.RX_Data(RX_Data2),
+		  .Clk_R(Clk_R),
+		  .Rst_n(Rst_n),
+		  .RX_Data_Valid(RX_Data_Valid[2]),
+		  .TX_Data_Ready(TX_Data_Ready[2]),
+		  .Packet_From_Node_Valid(Packet_From_Node_Valid[2]),
+		  .Packet_From_Node(Packet_From_Node2),
+		  .Core_Load_Ack(Core_Load_Ack[2]),
+		  .Packet_To_Node_Valid(Packet_To_Node_Valid[2]),
+		  .RX_Data_Ready(RX_Data_Ready[2]),
+		  .TX_Data_Valid(TX_Data_Valid[2]),
+		  .TX_Data(TX_Data2),
+		  .Packet_To_Node(Packet_To_Node2));
+
+   transmitter TX2(.TX_Data(TX_Data2),
+		.TX_Data_Valid(TX_Data_Valid[2]),
+		.Clk_S(Clk_S),
+		.Rst_n(Rst_n),
+		.TX_Ready(TX_Data_Ready[2]),
+		.S_Data(s_data2_0));
+
+   receiver RX2(.RX_Ready(RX_Data_Ready[2]),
+		.Clk_S(Clk_S),
+		.Rst_n(Rst_n),
+		.S_Data(s_data1_2),
+		.RX_Data_Valid(RX_Data_Valid[2]),
+		.RX_Data(RX_Data2));
 
    /* Generate TX / RX clock signal */
    always begin
@@ -77,28 +137,24 @@ module txrx_and_core_tb();
 	#4;
    end
 
-   
-
-   initial begin
-	// Send a NACK
-	data_packet_to_send = 61'b01_1111_0111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_111;
-   end
-
    initial begin
 	Clk_S = 0;
 	Clk_R = 0;
-	$display("Resetting...");
-	$monitor("%t: Clk_S: %b S_Data_in: %b  S_Data_out: %b RX_Data_Valid: %b", $time,Clk_S, S_Data_in, S_Data_out, RX.RX_Data_Valid); 
+	$display("Resetting all...");
+	$monitor("Time: %t - rc0 state: %d  rc1 state: %d rc2 state: %d \n\t\t TX_Data0 Packet: %h RX_Data1 Packet: %h RX_Packet_To_Node: %d rc1_datatype: %b", $time, rc0.main_control.state, rc1.main_control.state, rc2.main_control.state, TX_Data0, RX1.RX_Data, Packet_To_Node1, rc1.main_control.data_type); 
 	Rst_n = 1'b0;
 	#10;
 	Rst_n = 1'b1;
-	for(i = 0; i < 61; i = i + 1)begin
-		S_Data_in = data_packet_to_send[60];
-		data_packet_to_send = data_packet_to_send << 1;
-		#2;
-	end
-	S_Data_in = 1'b0;
+	force Packet_From_Node0 = {4'b0001, 1'b0, 24'd42};
+	force Packet_From_Node_Valid[0] = 1'b1;
 	#500;
+	force Packet_From_Node0 = {4'b0001, 1'b0, 24'd100};
+	#500;
+	force Packet_From_Node_Valid[0] = 1'b0;
+	force Packet_From_Node_Valid[1] = 1'b1;
+	force Packet_From_Node1 = {4'b0000, 1'b0, 24'd69};
+	#1500;
+
 	$stop;
    end // initial begin
 endmodule // router_core_t
