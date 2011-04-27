@@ -30,7 +30,7 @@ elaborate router_core
 check_design
 
 ## Create clock network (Values are in nanoseconds)
-create_clock "Clk_R" -period 2 -waveform { 0 1 }
+create_clock "Clk_R" -period 1.375 -waveform { 0 .6875 }
 ## Set clk as don't touch
 set_dont_touch_network [find port Clk_R]
 
@@ -64,6 +64,6 @@ report_timing
 report_constraints -all_violators
 
 ### Write post-synth netlist
-write -f verilog router_core -output ./router_core_synth_45nm.v -hierarchy
+write -f verilog router_core -output ./router_core_synth_40nm.v -hierarchy
 
 exit
