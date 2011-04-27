@@ -18,7 +18,7 @@ elaborate transmitter
 check_design
 
 ## Create clock network (Values are in nanoseconds)
-create_clock "Clk_S" -period 2 -waveform { 0 1 }
+create_clock "Clk_S" -period .75 -waveform { 0 .375 }
 ## Set clk as don't touch
 set_dont_touch_network [find port Clk_S]
 
@@ -52,4 +52,4 @@ report_timing
 report_constraints -all_violators
 
 ### Write post-synth netlist
-write -f verilog transmitter -output ./transmitter_synth_45nm.v -hierarchy
+write -f verilog transmitter -output ./transmitter_synth_40nm.v -hierarchy
