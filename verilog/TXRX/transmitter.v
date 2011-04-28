@@ -1,5 +1,3 @@
-// TX Unit Behavioral Verilog //
-
 module transmitter (input [54:0] TX_Data,
                     input TX_Data_Valid, Clk_S, Rst_n,
 		    output reg TX_Ready,
@@ -11,7 +9,7 @@ module transmitter (input [54:0] TX_Data,
 
    reg [1:0] state, next_state;
    wire      ready;
-   reg 	     start, next_start;
+   reg 	     start, next_TX_Ready, next_start;
 
    trans_protocol protocol(.clk(Clk_S), 
 			   .start(start), 
@@ -23,18 +21,18 @@ module transmitter (input [54:0] TX_Data,
    always @(posedge Clk_S, negedge Rst_n) begin
       if (!Rst_n) begin
 	 state <= RST;
-	 TX_Ready <= 1'b0;
 	 start <= 1'b0;
+	 TX_Ready <= 1'b0;
       end
       else begin
-	start <= next_start;
-	state <= next_state;
+	 start <= next_start;
+	 state <= next_state;
+	 TX_Ready <= next_TX_Ready;
       end
    end
 
    always @(TX_Data_Valid, ready, state) begin
       case (state)
-
 	RST: begin
 	   if (!TX_Data_Valid) begin
 	      next_state = RDY;
@@ -65,8 +63,10 @@ module transmitter (input [54:0] TX_Data,
 	   end
 	end
 
-	default:
-	  next_state = 2'bxx;
+	default: begin
+	   next_state = 2'bxx;
+	   next_start = 1'bx;
+	end
       endcase // case (state)
    end // always @ (TX_Data_Valid, ready, state)
 
@@ -75,15 +75,19 @@ module transmitter (input [54:0] TX_Data,
       case(state)
 
 	RST: begin
-	   TX_Ready = 1'b0;
+	   next_TX_Ready = 1'b0;
 	end
 
 	RDY: begin
-	   TX_Ready = 1'b1;
+	   next_TX_Ready = 1'b1;
 	end
 
 	TRANSMIT: begin
-	   TX_Ready = 1'b0;
+	   next_TX_Ready = 1'b0;
+	end
+
+	default: begin
+	   next_TX_Ready = 1'b0;
 	end
       endcase
    end // always @ (state)
