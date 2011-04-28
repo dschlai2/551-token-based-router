@@ -11,37 +11,36 @@ module receiver(
 	parameter receiveSignal = 2'b00, readyTT = 2'b01, transmit = 2'b11;	// State values
 
 
-	// Transmission Protocol Unit
-	receive_protocol rx_side(	.clk		(Clk_S),
+   // Transmission Protocol Unit
+   receive_protocol rx_side(	.clk		(Clk_S),
 				.rst		(Rst_n),
 				.S_Data		(S_Data),
 				.ready		(good_data),
 				.packet		(RX_Data[54:0]));
 
 
-	// Sequential Logic
-	always@(posedge Clk_S, negedge Rst_n) begin
-		
-		if (~Rst_n) begin
-			state <= receiveSignal;
-		end
+   // Sequential Logic
+   always@(posedge Clk_S, negedge Rst_n) begin   
+      if (~Rst_n) begin
+	 state <= receiveSignal;
+      end
+      
+      else begin
+	 state <= nextState;
+      end
+      
+   end // always
+   
+   
+   // Next state logic
+   always@(state, good_data, RX_Ready) begin
+      
+      case(state)
 
-		else begin
-			state <= nextState;
-		end
-
-	end // always
-
-
-	// Next state logic
-	always@(state, good_data, RX_Ready) begin
-
-		case(state)
-
-		receiveSignal: if (good_data)
-				nextState = readyTT;
-				else
-				nextState = receiveSignal;
+	receiveSignal: if (good_data)
+	  nextState = readyTT;
+	else
+				  nextState = receiveSignal;
 		
 		readyTT: if(RX_Ready)
 			nextState = transmit;
