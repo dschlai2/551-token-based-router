@@ -30,7 +30,7 @@ elaborate router_core
 check_design
 
 ## Create clock network (Values are in nanoseconds)
-create_clock "Clk_R" -period 4 -waveform { 0 2 }
+create_clock "Clk_R" -period 1.375 -waveform { 0 .6875 }
 ## Set clk as don't touch
 set_dont_touch_network [find port Clk_R]
 
@@ -39,12 +39,12 @@ set_dont_touch_network [find port Clk_R]
 link
 set prim_inputs [remove_from_collection [all_inputs] [find port Clk_R]]
 ## This determines input drive strength
-set_driving_cell -lib_cell DDRVLS33 -pin Z -from_pin A -library gflxio [copy_collection $prim_inputs]
+##set_driving_cell -lib_cell DDRVLS33 -pin Z -from_pin A -library gflxio [copy_collection $prim_inputs]
 ## Apply the same wire load model from the top-level module to all children
 set_wire_load_mode top
-set_wire_load_model -name B1X1 -library gflxp
+set_wire_load_model -name TSMC128K_Lowk_Aggresive -library tcbn40lpbwptc
 ## Sets the operating conditions to the Nominal setting from the gflxp library
-set_operating_conditions NOM -library gflxp
+set_operating_conditions -library tcbn40lpbwptc NCCOM 
 ## Set Input/Output Delays
 set_input_delay -clock Clk_R 0 [copy_collection $prim_inputs]
 set_output_delay -clock Clk_R 0 [all_outputs]
@@ -64,6 +64,6 @@ report_timing
 report_constraints -all_violators
 
 ### Write post-synth netlist
-write -f verilog router_core -output ./router_core_synth.v -hierarchy
+write -f verilog router_core -output ./router_core_synth_40nm.v -hierarchy
 
 exit
