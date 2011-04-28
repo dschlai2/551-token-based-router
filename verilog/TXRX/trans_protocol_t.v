@@ -24,8 +24,8 @@ module trans_protocol_t ();
       #5;
       
       
-      $monitor("%t:: start:%b\t rst:%b\t: ready:%b\t S_Data:%b\t state:%d\t counter:%d", 
-	       $time,start,rst,ready,S_Data,tb.state,tb.counter);
+      $monitor("%t::start:%b\t rst:%b\t: ready:%b\t S_Data:%b\t state:%d\t counter:%d pack:%b", 
+	       $time,start,rst,ready,S_Data,tb.state,tb.counter,0);
 
       $display("Resetting module\n");
       rst <= 1;
