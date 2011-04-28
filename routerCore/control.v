@@ -1,4 +1,4 @@
-module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, Packet_To_Node_Valid, 
+module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, data_type, Packet_To_Node_Valid, 
 			Core_Load_Ack, Packet_From_Node_Valid, buffer_select, 
 			tx_data_select, rc_ready, tx_ready, rc_has_data);
 
@@ -7,8 +7,6 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
    parameter[2:0] NACK =   3'b011;
    parameter[2:0] DATA_C = 3'b010;
    parameter[2:0] DATA_3 = 3'b001;
-   
-   parameter[3:0] OUR_ADDRESS = 4'b0001;
 
    /* tx_data_select values */
    parameter [2:0] tx_ACK = 3'd0;
@@ -34,6 +32,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
    
    input rx_has_data, bad_decode, Packet_From_Node_Valid, tx_ready, Clk_R, Rst_n;
    input [3:0] address;
+   input [3:0] r_addr;
    input [2:0] data_type;
    
    output reg  rc_ready, Packet_To_Node_Valid, Core_Load_Ack, buffer_select, rc_has_data;
@@ -57,7 +56,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
    always@(*)begin
       case(state)
 	CHECK_IF_MASTER: begin
-	   if(OUR_ADDRESS == 4'b0000) begin
+	   if(r_addr == 4'b0000) begin
 	     next_state = CHECK_NODE;
 	     next_select_sig = 3'bx;
 	end
@@ -142,7 +141,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, bad_decode, data_type, 
 	    next_state = FORWARD;
 	   next_select_sig = tx_FORWARD;
 		end
-	  else if (address != OUR_ADDRESS) begin
+	  else if (address != r_addr) begin
 	    next_state = FORWARD;
 	next_select_sig = tx_FORWARD;
 	end
