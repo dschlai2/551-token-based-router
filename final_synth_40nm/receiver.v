@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module receiver(
     input       RX_Ready, 
 		Clk_S, 
