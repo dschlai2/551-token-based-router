@@ -126,36 +126,56 @@ module txrx_and_core_tb();
    /* Generate TX / RX clock signal */
    always begin
       Clk_S = ~Clk_S;
-      #0.375;
+      #1;
    end
 
    /* Generate Router Core clock signal */
-   always begin
+  always begin
 	Clk_R = ~Clk_R;
-	#0.6875;
+	#1;
    end
 
    initial begin
-	Clk_S = 0;
-	Clk_R = 0;
-	$display("Resetting all...");
+      Clk_S = 0;
+      Clk_R = 0;
+      $display("Resetting all...");
 	//$monitor("Time: %t - rc0 state: %d  rc1 state: %d rc2 state: %d \n\t\t TX_Data0 Packet: %h RX_Data1 Packet: %h RX_Packet_To_Node: %d rc1_datatype: %b", 
 	//	$time, rc0.main_control.state, rc1.main_control.state, rc2.main_control.state, TX_Data0, RX1.RX_Data, Packet_To_Node1, rc1.main_control.data_type); 
-	$monitor("Time: %t - TX_Data1 %d", $time, rc0.TX_Data);
-	Rst_n = 1'b0;
-	#10;
-	Rst_n = 1'b1;
-	force Packet_From_Node0 = {4'b0001, 1'b0, 24'd42};
-	force Packet_From_Node_Valid[0] = 1'b1;
-	#125;
-	force Packet_From_Node0 = {4'b0001, 1'b0, 24'd100};
-	#125;
-	force Packet_From_Node_Valid[0] = 1'b0;
-	force Packet_From_Node_Valid[1] = 1'b1;
-	force Packet_From_Node1 = {4'b0000, 1'b0, 24'd69};
-	#500;
+      $monitor("Time: %t - Clk: %b\t TX_Data:%d, DV: %b, DR:%b", $time, Clk_S,TX_Data0, TX_Data_Valid[0], TX_Data_Ready[0]);
 
-	$stop;
+
+      /* Initialize all isgnals */
+      force Packet_From_Node0 = 0;
+      force Packet_From_Node0 = 0;
+      force Packet_From_Node0 = 0;
+
+      force Packet_From_Node_Valid[0] = 0;
+      force Packet_From_Node_Valid[1] = 0;
+      force Packet_From_Node_Valid[2] = 0;
+
+      /* Begin tests */
+      #2;
+      
+      Rst_n = 1'b0;
+      #10;
+      Rst_n = 1'b1;
+      #5;
+
+
+
+      
+      
+      force Packet_From_Node0 = {4'b0001, 1'b0, 24'd42};
+      force Packet_From_Node_Valid[0] = 1'b1;
+      #125;
+      force Packet_From_Node0 = {4'b0001, 1'b0, 24'd100};
+      #125;
+      force Packet_From_Node_Valid[0] = 1'b0;
+      force Packet_From_Node_Valid[1] = 1'b1;
+      force Packet_From_Node1 = {4'b0000, 1'b0, 24'd69};
+      #500;
+      
+      $stop;
    end // initial begin
 endmodule // router_core_t
 
