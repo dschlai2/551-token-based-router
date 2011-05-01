@@ -58,11 +58,11 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, dat
 	CHECK_IF_MASTER: begin
 	   if(r_addr == 4'b0000) begin
 	     next_state = CHECK_NODE;
-	     next_select_sig = 3'bx;
+	     next_select_sig = select_sig;
 	end
 	   else begin
 	     next_state = LISTEN_NO_TOKEN;
-	     next_select_sig = 3'bx;
+	     next_select_sig = select_sig;
 	end
 	end
 	CHECK_NODE: begin
@@ -77,7 +77,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, dat
 		end
 	      else begin
 		next_state = CHECK_NODE;
-		next_select_sig = 3'bx;
+		next_select_sig = select_sig;
 	   end
 	end
 	end
@@ -110,8 +110,8 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, dat
 		next_select_sig = tx_NEW;
 		end
 	     else begin
-	       next_state = CHECK_NODE;
-		next_select_sig = 3'bx;
+	        next_state = CHECK_NODE;
+		next_select_sig = select_sig;
 		end
 	  end
 	  else begin
@@ -123,8 +123,8 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, dat
 
 	LISTEN_NO_TOKEN: begin
 	  if (~rx_has_data) begin
-	    next_state = LISTEN_NO_TOKEN;
-		next_select_sig = 3'bx;
+	    	next_state = LISTEN_NO_TOKEN;
+		next_select_sig = select_sig;
 		end
 	  else begin
 	    next_state = CHECK_ADDRESS;
@@ -135,7 +135,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, dat
 	CHECK_ADDRESS:
 	  if (data_type == TOKEN) begin
 	    next_state = CHECK_NODE;
-		next_select_sig = 3'bx;
+		next_select_sig = select_sig;
 		end
 	  else if (data_type == ACK | data_type == NACK) begin
 	    next_state = FORWARD;
