@@ -21,9 +21,7 @@ module trans_protocol(TX_Data,
    reg [5:0] next_counter, counter;
    wire [5:0] counter_1;
 
-   /* States */
-   parameter WAIT = 2'd0;
-   parameter TRANSMIT = 2'd1;
+   assign counter_1 = counter -1;
 
    /* State transitions */
    always @(posedge clk, posedge rst) begin
@@ -76,21 +74,46 @@ module trans_protocol(TX_Data,
 	     next_state = DONE;
 	     next_counter = 6'b1;
 	  end
-	
-	/* Default Case */
-	default: begin
-	   next_state = 2'bx;
-	   next_counter = 6'bx;
+
+
+      /* Return to WAIT */
+	DONE: begin
+	   next_state = WAIT;
+	   next_counter = 6'b1;
 	end
 	
+	default: begin
+	   next_state = WAIT;
+	   next_counter = 6'b1;
+	end
       endcase // case (state)
    end // always @ (state)
-   
 
+   
    /* Output logic */
    always @(*) begin
       case (state)
-	/* Waiting for start signal */
+	 START: begin
+	    if (counter > 0) begin
+	      next_S_Data = START_SEQ[counter_1];
+	    end else
+	      next_S_Data = TX_Data[counter];
+	      next_ready = 1'b0;
+	 end
+
+	 TRANSMIT: begin
+	    if (counter > 0) begin
+	      next_S_Data = TX_Data[counter_1];
+	    end else
+	      next_S_Data = 1'b1;
+	    next_ready = 1'b0;
+	 end	
+
+	DONE: begin
+	   next_S_Data = 1'b0;
+	   next_ready = 1'b1;
+	end
+
 	WAIT: begin
 	   next_S_Data = 1'b0;
 	   next_ready = 1'b0;
@@ -103,26 +126,7 @@ module trans_protocol(TX_Data,
 	
       endcase // case state
 
-	/* Transmitting data */
-	TRANSMIT: begin
-	   next_S_Data = 1'b1;
-	   if (counter > 0) begin
-	      next_S_Data = packet[counter-1];
-	      next_S_Data = 1'b1;
-	      next_ready = 1'b0;
-	   end else begin
-	      next_S_Data = 1'b1;
-	      next_ready = 1'b1;
-	   end
-	end
-
-	/* Default Case */
-	default: begin
-	   next_S_Data = 1'b1;
-	   next_ready = 1'b0;
-	end
-      endcase // case (state)
-   end // always @ (*)
+   end // always @ (state, counter)
    
 endmodule
 	
