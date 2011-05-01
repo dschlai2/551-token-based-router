@@ -1,3 +1,5 @@
+`timescale 1ns/1ps
+
 
 module router_tb_template();
 
@@ -16,7 +18,7 @@ module router_tb_template();
 
    /* Router inputs */
    reg [NO_ROUTERS-1:0] Clk_R, Packet_From_Node_Valid;
-   reg [3:0] r_addr [NO_ROUTERS-1:0];
+   wire [3:0] r_addr [NO_ROUTERS-1:0];
    reg [28:0] Packet_From_Node [NO_ROUTERS-1:0];
    wire [NO_ROUTERS-1:0] S_Data_in;
    
@@ -33,9 +35,9 @@ module router_tb_template();
    assign S_Data_in[2] = S_Data_out[1];
 
    /* Set addresses */
-   r_addr[0] = 4'd0;
-   r_addr[1] = 4'd1;
-   r_addr[2] = 4'd8;
+   assign r_addr[0] = 4'd0;
+   assign r_addr[1] = 4'd1;
+   assign r_addr[2] = 4'd8;
 
    /* Instantiate routers */
    router r0 (.Clk_S(Clk_S),
@@ -74,8 +76,120 @@ module router_tb_template();
 	      .S_Data_out (S_Data_out[2]),
 	      .Packet_To_Node (Packet_To_Node[2]));
    
+
+   /* Send and receive tasks */
+   task send;
+      input [3:0] router;
+      input       encode_type;
+      input [3:0] address;
+      input [23:0] data;
+
+      begin
+	 $display ("send: %d to %d.  Data: %d", router, address, data);
+	 Packet_From_Node_Valid[router] = 1'b1;
+	 Packet_From_Node[router] = { address, encode_type, data };
+
+	 #2;
+      end
+   endtask // send
+   
+   task receive;
+      input [3:0] router;
+      input [23:0] data;
+
+      output 	   correct;
+
+      begin
+	 while (Packet_To_Node_Valid[router] === 0) begin
+	 end
+	 correct = Packet_To_Node[router] === data;
+      end
+   endtask // receive
+
+
+   /* Clock Signals */
+   always  begin
+      Clk_S = ~Clk_S;
+      #1;
+   end
+   always begin
+      Clk_R[0] = ~Clk_R[0];
+      #1;
+   end
+   always begin
+      Clk_R[1] = ~Clk_R[1];
+      #1;
+   end
+   always begin
+      Clk_R[2] = ~Clk_R[2];
+      #1;
+   end
+
+
+   
+   /* Monitor Statements */
+  always @(r0.RX_Data) $display("%t:Rc0.RX_Data: %h", $time, r0.RX_Data);
+  always @(r1.RX_Data) $display("%t:Rc1.RX_Data: %h", $time, r1.RX_Data);
+  always @(r2.RX_Data) $display("%t:Rc2.RX_Data: %h", $time, r2.RX_Data);
+   
+  always @(r0.TX_Data) $display("%t:Rc0.TX_Data: %h", $time, r0.TX_Data);
+  always @(r1.TX_Data) $display("%t:Rc1.TX_Data: %h", $time, r1.TX_Data);
+  always @(r2.TX_Data) $display("%t:Rc2.TX_Data: %h", $time, r2.TX_Data);   
+   
+   
+
+   initial begin
+
+
+      /* Start Clocks */
+      Clk_S = 1'b0;
+      Clk_R = 1'b0;
+
+      /* Reset Modules */
+      Rst_n = 1'b0;
+      #10;
+      Rst_n = 1'b1;
+
+      /* Display Router Stats */
+      $display("Router info:");
+      for (i = 0; i < NO_ROUTERS; i = i + 1) begin
+	 $display ("Router %d has address: %d", i, r_addr[i]);
+      end
+      
+
+      /* Begin Tests Here */
+      $monitor("%t:: Data lines: 0:%d %b\t1: %d %b\t2:%d %b", $time,Packet_To_Node[0], Packet_From_Node_Valid[0],
+	       Packet_To_Node[1], Packet_From_Node_Valid[1], Packet_From_Node[2], Packet_From_Node_Valid[2]);
+      
+      send(0,1,8,23'd1234);
+      #500;
+      $display ("Lowering Packet From Node Valid - should send token.");
+      Packet_From_Node_Valid[0] = 0;
+      #1000;
+
+
+      /*
+      send(1,0,0,23'd4321);
+      #2000;
+      Packet_From_Node_Valid[1] = 1;
+      #20;
+       */
+      $stop;
+      
+   end
+   
+      
+
+   
 endmodule // one_router_tb
 
+
+
+
+
+      
+      
+   
 	      
 
 	   
