@@ -2,23 +2,23 @@
 remove_design -designs
 
 ## Load files ##
-read_file -format verilog ./router_core.v
-read_file -format verilog ./append_3of6.v                  
-read_file -format verilog ./rx_handshake.v   
-read_file -format verilog ./encode_logic.v            
-read_file -format verilog ./buffer.v                                
-read_file -format verilog ./six_bit_checker.v 
-read_file -format verilog ./master_mux.v              
-read_file -format verilog ./checksum_decoder.v             
-read_file -format verilog ./threeOfSixEncoder.v
-read_file -format verilog ./checksumEncoder.v		
-read_file -format verilog ./control.v	      
-read_file -format verilog ./tx_handshake.v
-read_file -format verilog ./decode_logic.v	      		     	
-read_file -format verilog ./decoder_3of6.v	      	
-read_file -format verilog ./type_check.v
-read_file -format verilog ./deserialize_core.v
-read_file -format verilog ./deserialize_rx.v      
+read_file -format verilog ./verilog/routerCore/router_core.v
+read_file -format verilog ./verilog/routerCore/append_3of6.v                  
+read_file -format verilog ./verilog/routerCore/rx_handshake.v   
+read_file -format verilog ./verilog/routerCore/encode_logic.v            
+read_file -format verilog ./verilog/routerCore/buffer.v                                
+read_file -format verilog ./verilog/routerCore/six_bit_checker.v 
+read_file -format verilog ./verilog/routerCore/master_mux.v              
+read_file -format verilog ./verilog/routerCore/checksum_decoder.v             
+read_file -format verilog ./verilog/routerCore/threeOfSixEncoder.v
+read_file -format verilog ./verilog/routerCore/checksumEncoder.v		
+read_file -format verilog ./verilog/routerCore/control.v	      
+read_file -format verilog ./verilog/routerCore/tx_handshake.v
+read_file -format verilog ./verilog/routerCore/decode_logic.v	      		     	
+read_file -format verilog ./verilog/routerCore/decoder_3of6.v	      	
+read_file -format verilog ./verilog/routerCore/type_check.v
+read_file -format verilog ./verilog/routerCore/deserialize_core.v
+read_file -format verilog ./verilog/routerCore/deserialize_rx.v      
 
 ## Set top-level module
 current_design router_core
@@ -31,6 +31,7 @@ check_design
 
 ## Create clock network (Values are in nanoseconds)
 create_clock "Clk_R" -period 1.375 -waveform { 0 .6875 }
+
 ## Set clk as don't touch
 set_dont_touch_network [find port Clk_R]
 
