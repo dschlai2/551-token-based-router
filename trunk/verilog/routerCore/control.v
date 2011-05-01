@@ -110,7 +110,7 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, dat
 		next_select_sig = tx_NEW;
 		end
 	     else begin
-	        next_state = CHECK_NODE;
+	       next_state = CHECK_NODE;
 		next_select_sig = select_sig;
 		end
 	  end
@@ -123,12 +123,12 @@ module control_logic(Clk_R, Rst_n, rx_has_data, address, r_addr, bad_decode, dat
 
 	LISTEN_NO_TOKEN: begin
 	  if (~rx_has_data) begin
-	    	next_state = LISTEN_NO_TOKEN;
+	    next_state = LISTEN_NO_TOKEN;
 		next_select_sig = select_sig;
 		end
 	  else begin
 	    next_state = CHECK_ADDRESS;
-		next_select_sig = 3'bx;
+		next_select_sig = select_sig;
 		end
 		end
 
