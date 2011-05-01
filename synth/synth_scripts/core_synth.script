@@ -1,0 +1,69 @@
+## Remove synthesis ghost files via exorcism ##
+remove_design -designs
+
+## Load files ##
+read_file -format verilog ./router_core.v
+read_file -format verilog ./append_3of6.v                  
+read_file -format verilog ./rx_handshake.v   
+read_file -format verilog ./encode_logic.v            
+read_file -format verilog ./buffer.v                                
+read_file -format verilog ./six_bit_checker.v 
+read_file -format verilog ./master_mux.v              
+read_file -format verilog ./checksum_decoder.v             
+read_file -format verilog ./threeOfSixEncoder.v
+read_file -format verilog ./checksumEncoder.v		
+read_file -format verilog ./control.v	      
+read_file -format verilog ./tx_handshake.v
+read_file -format verilog ./decode_logic.v	      		     	
+read_file -format verilog ./decoder_3of6.v	      	
+read_file -format verilog ./type_check.v
+read_file -format verilog ./deserialize_core.v
+read_file -format verilog ./deserialize_rx.v      
+
+## Set top-level module
+current_design router_core
+
+## Elaborate
+elaborate router_core
+
+## Check for errors
+check_design
+
+## Create clock network (Values are in nanoseconds)
+create_clock "Clk_R" -period 1.375 -waveform { 0 .6875 }
+## Set clk as don't touch
+set_dont_touch_network [find port Clk_R]
+
+## Set environmental operating characteristics - Needed for accurate area and timing estimates
+## Link ensures that all modules are connected before setting characteristics.
+link
+set prim_inputs [remove_from_collection [all_inputs] [find port Clk_R]]
+## This determines input drive strength
+##set_driving_cell -lib_cell DDRVLS33 -pin Z -from_pin A -library gflxio [copy_collection $prim_inputs]
+## Apply the same wire load model from the top-level module to all children
+set_wire_load_mode top
+set_wire_load_model -name TSMC128K_Lowk_Aggresive -library tcbn40lpbwptc
+## Sets the operating conditions to the Nominal setting from the gflxp library
+set_operating_conditions -library tcbn40lpbwptc NCCOM 
+## Set Input/Output Delays
+set_input_delay -clock Clk_R 0 [copy_collection $prim_inputs]
+set_output_delay -clock Clk_R 0 [all_outputs]
+
+## Set Area Constraint
+set_max_area 0
+
+### Compile
+compile_ultra
+
+### Verify Timing Success
+check_timing
+
+## Print reports
+report_area
+report_timing
+report_constraints -all_violators
+
+### Write post-synth netlist
+write -f verilog router_core -output ./router_core_synthed.v -hierarchy
+
+exit
