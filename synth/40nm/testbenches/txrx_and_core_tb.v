@@ -1,5 +1,5 @@
 module txrx_and_core_tb();
-
+   
    /* router core control logic states */
    parameter ERR_STATE =        4'd0;   
    parameter CHECK_IF_MASTER =	4'd1;
@@ -16,12 +16,12 @@ module txrx_and_core_tb();
 
    // Clockz
    reg Clk_S, Clk_R, Rst_n;
-
+   
    // Wires to and from processor nodes
    wire [2:0] Core_Load_Ack, Packet_From_Node_Valid, Packet_To_Node_Valid;
    wire [23:0] Packet_To_Node0, Packet_To_Node1, Packet_To_Node2;
    wire [28:0] Packet_From_Node0, Packet_From_Node1, Packet_From_Node2;
-
+   
    // Wires between modules
    wire s_data0_1, s_data1_2, s_data2_0;
    wire [2:0] TX_Data_Ready;
@@ -134,25 +134,27 @@ module txrx_and_core_tb();
    end
 
    initial begin
-	Clk_S = 0;
-	Clk_R = 0;
-	$display("Resetting all...");
-	//$monitor("Time: %t - rc0 state: %d  rc1 state: %d rc2 state: %d \n\t\t TX_Data0 Packet: %h RX_Data1 Packet: %h RX_Packet_To_Node: %d rc1_datatype: %b", $time, rc0.main_control.state, rc1.main_control.state, rc2.main_control.state, TX_Data0, RX1.RX_Data, Packet_To_Node1, rc1.main_control.data_type); 
-	$monitor("Time: %t - Core 1 TX_Data: %b   Core 2 Packet to Node: %d", $time, TX0.TX_Data, rc1.Packet_To_Node);
-	Rst_n = 1'b0;
-	#10;
-	Rst_n = 1'b1;
-	force Packet_From_Node0 = {4'b0001, 1'b0, 24'd42};
-	force Packet_From_Node_Valid[0] = 1'b1;
-	#500;
-	force Packet_From_Node0 = {4'b0001, 1'b0, 24'd100};
-	#500;
-	force Packet_From_Node_Valid[0] = 1'b0;
-	force Packet_From_Node_Valid[1] = 1'b1;
-	force Packet_From_Node1 = {4'b0000, 1'b0, 24'd69};
-	#1500;
-
-	$stop;
+      Clk_S = 0;
+      Clk_R = 0;
+      $display("Resetting all...");
+      //$monitor("Time: %t - rc0 state: %d  rc1 state: %d rc2 state: %d \n\t\t TX_Data0 Packet: %h RX_Data1 Packet: %h RX_Packet_To_Node: %d rc1_datatype: %b", $time, rc0.main_control.state, rc1.main_control.state, rc2.main_control.state, TX_Data0, RX1.RX_Data, Packet_To_Node1, rc1.main_control.data_type); 
+      $monitor("Time: %t - Core 1 TX_Data: %b   Core 2 Packet to Node: %d", $time, TX0.TX_Data, rc1.Packet_To_Node);
+      Rst_n = 1'b0;
+      #10;
+      Rst_n = 1'b1;
+      #2;
+      
+      force Packet_From_Node0 = {4'b0001, 1'b0, 24'd42};
+      force Packet_From_Node_Valid[0] = 1'b1;
+      #500;
+      force Packet_From_Node0 = {4'b0001, 1'b0, 24'd100};
+      #500;
+      force Packet_From_Node_Valid[0] = 1'b0;
+      force Packet_From_Node_Valid[1] = 1'b1;
+      force Packet_From_Node1 = {4'b0000, 1'b0, 24'd69};
+      #1500;
+      
+      $stop;
    end // initial begin
 endmodule // router_core_t
 
