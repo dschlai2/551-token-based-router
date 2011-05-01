@@ -94,6 +94,7 @@ module router_tb_template();
    endtask // send
    
    task receive;
+      input [3:0] src;
       input [3:0] router;
       input [23:0] data;
 
@@ -102,7 +103,9 @@ module router_tb_template();
       begin
 	 while (Packet_To_Node_Valid[router] === 0) begin
 	 end
+	 $display ("rcv: %d.  Data: %d", router, data);
 	 correct = Packet_To_Node[router] === data;
+	 Packet_From_Node_Valid[src] = 1'b0;
       end
    endtask // receive
 
@@ -128,14 +131,14 @@ module router_tb_template();
 
    
    /* Monitor Statements */
-  always @(r0.RX_Data) $display("%t:Rc0.RX_Data: %h", $time, r0.RX_Data);
+ /*always @(r0.RX_Data) $display("%t:Rc0.RX_Data: %h", $time, r0.RX_Data);
   always @(r1.RX_Data) $display("%t:Rc1.RX_Data: %h", $time, r1.RX_Data);
   always @(r2.RX_Data) $display("%t:Rc2.RX_Data: %h", $time, r2.RX_Data);
    
   always @(r0.TX_Data) $display("%t:Rc0.TX_Data: %h", $time, r0.TX_Data);
   always @(r1.TX_Data) $display("%t:Rc1.TX_Data: %h", $time, r1.TX_Data);
   always @(r2.TX_Data) $display("%t:Rc2.TX_Data: %h", $time, r2.TX_Data);   
-   
+   */
    
 
    initial begin
@@ -170,15 +173,14 @@ module router_tb_template();
 
 
       #5000;
+      $display ("Lowering packet from node valid - every sends tokens now.");
+      $monitor("%t:: %h %h %h", $time, r0.RX_Data, r1.RX_Data, r2.RX_Data);
+      Packet_From_Node_Valid[1] = 0;
+      Packet_From_Node_Valid[2] = 0;
+      #100000;
+
+
       
-
-
-      /*
-      send(1,0,0,23'd4321);
-      #2000;
-      Packet_From_Node_Valid[1] = 1;
-      #20;
-       */
       $stop;
       
    end
