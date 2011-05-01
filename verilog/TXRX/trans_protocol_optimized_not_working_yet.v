@@ -1,80 +1,66 @@
+		   	    
 module trans_protocol(TX_Data,
-    start, rst, clk,
-    ready, S_Data);
-
+		      start, rst, clk, ready, S_Data);
    input [54:0] TX_Data;
-   input 	start, rst, clk;
-   output reg 	ready, S_Data;
-      
-   parameter [4:0] sz_START_SEQ = 6'd6;
-   parameter [5:0] sz_DATA =  6'd55;
-      
-   parameter [5:0] START_SEQ = 6'b01_1111;
-   parameter [2:0] START = 3'd0;
-   parameter [2:0] S_SEQ = 3'd1;
-   parameter [2:0] TRANSMIT = 3'd4;
-   parameter [2:0] DONE = 3'd5;
-   parameter [2:0] WAIT = 3'd6;
+   input       start, rst, clk;
+   output reg  ready, S_Data;
 
-   reg 	     next_ready, next_S_Data;
-   reg [3:0] state, next_state;
-   reg [5:0] next_counter, counter;
-   wire [5:0] counter_1;
+   /* Packet Size */
+   parameter sz_Packet = 6'd61;  
 
    /* States */
    parameter WAIT = 2'd0;
    parameter TRANSMIT = 2'd1;
 
+   /* Assembled Packet */
+   wire [60:0] packet = {6'b01_1111, TX_Data}; 
+
+   /* Count of how many bits remain to transmit */
+   reg [5:0]   counter, next_counter;
+
+   /* State logic */
+   reg [1:0]   state, next_state;
+
+   /* Output */
+   reg 	       next_S_Data, next_ready;
+
+   
    /* State transitions */
    always @(posedge clk, posedge rst) begin
       if (rst) begin
 	 state <= WAIT;
-	 S_Data <= 1'b0;
+	 S_Data <= 1'b1;
 	 ready <= 1'b0;
-	 counter <= 6'b1;
+	 counter <= 6'bx;
       end else begin
 	 S_Data <= next_S_Data;
 	 state <= next_state;
 	 counter <= next_counter;
 	 ready <= next_ready;
-      end
-   end
-      
+      end // else: !if(rst)
+   end // always @ (posedge clk, posedge rst)
+
    /* State logic */
    always @(*) begin
       case (state)
 	/* Start signal given */
 	WAIT:
 	  if (start) begin
-	     next_state = START;
-	     next_counter = sz_START_SEQ;
+	     next_state = TRANSMIT;
+	     next_counter = sz_Packet;
 	  end else begin
 	     next_state = WAIT;
-	     next_counter = 6'b1;
+	     next_counter = 6'bx;
 	  end
-
-	/* Transmitting start_seq */
-	START: begin
-	   if (counter > 1) begin
-	      next_state = START;
-	      next_counter = counter - 1;
-	   end
-	   
-	   /* Begin transmitting data */
-	   else begin
-	      next_state = TRANSMIT;
-	      next_counter = sz_DATA;
-	   end
-	end // case: START
 	
-	/* Transmitting data */
+	/* Transmitting */
 	TRANSMIT:
-	  if (counter >= 1) begin
+	  if (counter > 0) begin
 	     next_state = TRANSMIT;
 	     next_counter = counter - 1;
 	  end else begin
-	     next_state = DONE;
-	     next_counter = 6'b1;
+	     next_state = WAIT;
+	     next_counter = 6'bx;
 	  end
 	
 	/* Default Case */
@@ -84,7 +70,7 @@ module trans_protocol(TX_Data,
 	end
 	
       endcase // case (state)
-   end // always @ (state)
+   end // always @ (*)
    
 
    /* Output logic */
@@ -92,16 +78,12 @@ module trans_protocol(TX_Data,
       case (state)
 	/* Waiting for start signal */
 	WAIT: begin
-	   next_S_Data = 1'b0;
+	   if (start)
+	     next_S_Data = 1'b1;
+	   else
+	     next_S_Data = 1'b1;
 	   next_ready = 1'b0;
 	end
-	
-	default: begin
-	   next_S_Data = 1'b1;
-	   next_ready = 1'b0;
-	end
-	
-      endcase // case state
 
 	/* Transmitting data */
 	TRANSMIT: begin
@@ -124,10 +106,4 @@ module trans_protocol(TX_Data,
       endcase // case (state)
    end // always @ (*)
    
-endmodule
-	
-     
-	 
-	 
-		     
-		    
+endmodule // trans_protocol
