@@ -158,14 +158,19 @@ module router_tb_template();
       
 
       /* Begin Tests Here */
-      $monitor("%t:: Data lines: 0:%d %b\t1: %d %b\t2:%d %b", $time,Packet_To_Node[0], Packet_From_Node_Valid[0],
-	       Packet_To_Node[1], Packet_From_Node_Valid[1], Packet_To_Node[2], Packet_From_Node_Valid[2]);
+      $monitor("%t:: Data lines: 0:%d %b\t1: %d %b\t2:%d %b", $time,Packet_To_Node[0], Packet_To_Node_Valid[0],
+	       Packet_To_Node[1], Packet_To_Node_Valid[1], Packet_To_Node[2], Packet_To_Node_Valid[2]);
       
       send(4'd0,1'b1,4'd2,24'd1234);
+      send(4'd1,1'b0,4'd0,23'd80085);
       #5000;
       $display ("Lowering Packet From Node Valid - should send token.");
       Packet_From_Node_Valid[0] = 0;
       #10000;
+
+
+      #5000;
+      
 
 
       /*
@@ -177,10 +182,7 @@ module router_tb_template();
       $stop;
       
    end
-   
-      
 
-   
 endmodule // one_router_tb
 
 
