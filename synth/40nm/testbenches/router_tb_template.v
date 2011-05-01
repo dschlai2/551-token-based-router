@@ -37,7 +37,7 @@ module router_tb_template();
    /* Set addresses */
    assign r_addr[0] = 4'd0;
    assign r_addr[1] = 4'd1;
-   assign r_addr[2] = 4'd8;
+   assign r_addr[2] = 4'd2;
 
    /* Instantiate routers */
    router r0 (.Clk_S(Clk_S),
@@ -110,19 +110,19 @@ module router_tb_template();
    /* Clock Signals */
    always  begin
       Clk_S = ~Clk_S;
-      #1;
+      #10;
    end
    always begin
       Clk_R[0] = ~Clk_R[0];
-      #1;
+      #25;
    end
    always begin
       Clk_R[1] = ~Clk_R[1];
-      #1;
+      #25;
    end
    always begin
       Clk_R[2] = ~Clk_R[2];
-      #1;
+      #21;
    end
 
 
@@ -147,7 +147,7 @@ module router_tb_template();
 
       /* Reset Modules */
       Rst_n = 1'b0;
-      #10;
+      #100;
       Rst_n = 1'b1;
 
       /* Display Router Stats */
@@ -159,13 +159,13 @@ module router_tb_template();
 
       /* Begin Tests Here */
       $monitor("%t:: Data lines: 0:%d %b\t1: %d %b\t2:%d %b", $time,Packet_To_Node[0], Packet_From_Node_Valid[0],
-	       Packet_To_Node[1], Packet_From_Node_Valid[1], Packet_From_Node[2], Packet_From_Node_Valid[2]);
+	       Packet_To_Node[1], Packet_From_Node_Valid[1], Packet_To_Node[2], Packet_From_Node_Valid[2]);
       
-      send(0,1,8,23'd1234);
-      #500;
+      send(4'd0,1'b1,4'd2,24'd1234);
+      #5000;
       $display ("Lowering Packet From Node Valid - should send token.");
       Packet_From_Node_Valid[0] = 0;
-      #1000;
+      #10000;
 
 
       /*
