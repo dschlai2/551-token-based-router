@@ -31,18 +31,12 @@ module txrx_and_core_tb();
    wire [54:0] RX_Data0, RX_Data1, RX_Data2;
    wire [54:0] TX_Data0, TX_Data1, TX_Data2;
 
-   integer i;
-
-   // Router core address param overrides
-   defparam rc0.R_ADDR = 4'b0000; // Master
-   defparam rc1.R_ADDR = 4'b0001;
-   defparam rc2.R_ADDR = 4'b0010;
-
    // Router Base 0
    router_core rc0(.RX_Data(RX_Data0),
 		  .Clk_R(Clk_R),
 		  .Rst_n(Rst_n),
 		  .RX_Data_Valid(RX_Data_Valid[0]),
+		  .r_addr(4'b0000),
 		  .TX_Data_Ready(TX_Data_Ready[0]),
 		  .Packet_From_Node_Valid(Packet_From_Node_Valid[0]),
 		  .Packet_From_Node(Packet_From_Node0),
@@ -73,6 +67,7 @@ module txrx_and_core_tb();
 		  .Rst_n(Rst_n),
 		  .RX_Data_Valid(RX_Data_Valid[1]),
 		  .TX_Data_Ready(TX_Data_Ready[1]),
+		  .r_addr(4'b0001),
 		  .Packet_From_Node_Valid(Packet_From_Node_Valid[1]),
 		  .Packet_From_Node(Packet_From_Node1),
 		  .Core_Load_Ack(Core_Load_Ack[1]),
@@ -105,6 +100,7 @@ module txrx_and_core_tb();
 		  .Packet_From_Node_Valid(Packet_From_Node_Valid[2]),
 		  .Packet_From_Node(Packet_From_Node2),
 		  .Core_Load_Ack(Core_Load_Ack[2]),
+		  .r_addr(4'b0010),
 		  .Packet_To_Node_Valid(Packet_To_Node_Valid[2]),
 		  .RX_Data_Ready(RX_Data_Ready[2]),
 		  .TX_Data_Valid(TX_Data_Valid[2]),
