@@ -93,18 +93,17 @@ module router_tb_template();
       end
    endtask // send
    
-   task receive;
+   task rcv;
       input [3:0] src;
       input [3:0] router;
       input [23:0] data;
 
-      output 	   correct;
-
       begin
 	 while (Packet_To_Node_Valid[router] === 0) begin
+	    #1;
 	 end
-	 $display ("rcv: %d.  Data: %d", router, data);
-	 correct = Packet_To_Node[router] === data;
+	 $display ("rcv: %d to %d.  Data: %d", src, router, data);
+	 //Packet_To_Node[router] === data;
 	 Packet_From_Node_Valid[src] = 1'b0;
       end
    endtask // receive
@@ -179,6 +178,40 @@ module router_tb_template();
       Packet_From_Node_Valid[2] = 0;
       #100000;
 
+
+      $display ("Sending a bunch of packets.  These should always have send/rcv pairs.");
+      $monitor("%t:: Data lines: 0:%d %b\t1: %d %b\t2:%d %b", $time,Packet_To_Node[0], Packet_To_Node_Valid[0],
+	       Packet_To_Node[1], Packet_To_Node_Valid[1], Packet_To_Node[2], Packet_To_Node_Valid[2]);
+
+      send(0,1,2,123);
+      rcv(0,2,123);
+
+      send(2,1,1,123);
+      rcv(2,1,123);
+
+      send(1,1,2,323);
+      rcv(1,2,323);
+
+      #50000;
+      send(1,1,2,423);
+      rcv(1,2,423);
+
+      #100000;
+      send(1,1,0,123);
+      rcv(1,0,123);
+
+      send(0,1,2,123);
+      rcv(0,2,123);
+
+      #50000;
+      send(0,1,1,123);
+      rcv(0,1,123);
+
+      #5000;
+      send(0,1,2,123);
+      rcv(0,2,123);
+
+      #100000;
 
       
       $stop;
