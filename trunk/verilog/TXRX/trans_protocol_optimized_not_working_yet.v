@@ -8,8 +8,8 @@ module trans_protocol(TX_Data,
    parameter sz_Packet = 6'd61;  
 
    /* States */
-   parameter WAIT = 3'd0;
-   parameter TRANSMIT = 3'd1;
+   parameter WAIT = 2'd0;
+   parameter TRANSMIT = 2'd1;
 
    /* Assembled Packet */
    wire [60:0] packet = {6'b01_1111, TX_Data}; 
@@ -61,13 +61,21 @@ module trans_protocol(TX_Data,
 	     next_state = WAIT;
 	     next_counter = 6'bx;
 	  end
+	
+	/* Default Case */
+	default: begin
+	   next_state = 2'bx;
+	   next_counter = 6'bx;
+	end
+	
       endcase // case (state)
    end // always @ (*)
-
+   
 
    /* Output logic */
    always @(*) begin
       case (state)
+	/* Waiting for start signal */
 	WAIT: begin
 	   if (start)
 	     next_S_Data = 1'b1;
@@ -76,14 +84,23 @@ module trans_protocol(TX_Data,
 	   next_ready = 1'b0;
 	end
 
+	/* Transmitting data */
 	TRANSMIT: begin
+	   next_S_Data = 1'b1;
 	   if (counter > 0) begin
 	      next_S_Data = packet[counter-1];
+	      next_S_Data = 1'b1;
 	      next_ready = 1'b0;
 	   end else begin
 	      next_S_Data = 1'b1;
 	      next_ready = 1'b1;
 	   end
+	end
+
+	/* Default Case */
+	default: begin
+	   next_S_Data = 1'b1;
+	   next_ready = 1'b0;
 	end
       endcase // case (state)
    end // always @ (*)

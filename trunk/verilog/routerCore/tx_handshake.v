@@ -55,7 +55,6 @@ module tx_handshake(tx_ready, rc_has_data, TX_Data_Valid, TX_Data_Ready, clk, rs
 	default: begin
 	   tx_ready = 1'bx;
 	   TX_Data_Valid = 1'bx;
-	   next_TX_Data = 55'b1;
 	end
       endcase // case (state)
    end // always @ (state)
