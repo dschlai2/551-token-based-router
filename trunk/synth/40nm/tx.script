@@ -52,4 +52,7 @@ report_timing
 report_constraints -all_violators
 
 ### Write post-synth netlist
-write -f verilog transmitter -hierarchy
+write -f verilog -output transmitter.v -hierarchy
+
+
+exit
