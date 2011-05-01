@@ -7,7 +7,7 @@ module router(Clk_S, Clk_R, Rst_n, S_Data_in, S_Data_out, r_addr, Packet_To_Node
    output Core_Load_Ack, Packet_To_Node_Valid, S_Data_out;
    output [23:0] Packet_To_Node;
 
-   wire [54:0] RX_Data, TX_Data
+   wire [54:0] RX_Data, TX_Data;
 
    router_core rc(.RX_Data(RX_Data),
 		  .Clk_R(Clk_R),
