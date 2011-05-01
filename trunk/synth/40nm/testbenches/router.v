@@ -1,5 +1,7 @@
-module router(Clk_S, Clk_R, Rst_n, S_Data_in, S_Data_out, r_addr, Packet_To_Node, 
-			Packet_To_Node_Valid, Core_Load_Ack, Packet_From_Node_Valid, Packet_From_Node[28:0]);
+module router(Clk_S, Clk_R, Rst_n, S_Data_in, 
+	      S_Data_out, r_addr, Packet_To_Node,
+	      Packet_To_Node_Valid, Core_Load_Ack, 
+	      Packet_From_Node_Valid, Packet_From_Node);
 
    input Clk_S, Clk_R, Rst_n, S_Data_in, Packet_From_Node_Valid;
    input [3:0] r_addr;
@@ -8,6 +10,11 @@ module router(Clk_S, Clk_R, Rst_n, S_Data_in, S_Data_out, r_addr, Packet_To_Node
    output [23:0] Packet_To_Node;
 
    wire [54:0] RX_Data, TX_Data;
+
+
+
+
+   wire        RX_Data_Valid, TX_Data_Ready, TX_Data_Valid, RX_Data_Ready;
 
    router_core rc(.RX_Data(RX_Data),
 		  .Clk_R(Clk_R),
