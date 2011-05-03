@@ -183,6 +183,9 @@ module router_tb_template();
       $monitor("%t:: Data lines: 0:%d %b\t1: %d %b\t2:%d %b", $time,Packet_To_Node[0], Packet_To_Node_Valid[0],
 	       Packet_To_Node[1], Packet_To_Node_Valid[1], Packet_To_Node[2], Packet_To_Node_Valid[2]);
 
+      $monitor("%t:: %b",$time, Packet_To_Node_Valid[1]);
+      
+
       send(0,1,2,123);
       rcv(0,2,123);
 
@@ -211,8 +214,14 @@ module router_tb_template();
       send(0,1,2,123);
       rcv(0,2,123);
 
-      #100000;
+      #10000;
 
+      $display ("Sending malformed packets - expect bad packet on r0.TX_Data, else NACK");
+      send(0,1,2,3948);
+      force r1.rc.RX_Data[8:0] = 9'b0;
+
+      $monitor ("%t: TX Data lines: %h, %h, %h",$time, r0.TX_Data, r1.TX_Data, r2.TX_Data);
+      #50000;
       
       $stop;
       
