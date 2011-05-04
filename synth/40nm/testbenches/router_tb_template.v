@@ -139,7 +139,45 @@ module router_tb_template();
   always @(r2.TX_Data) $display("%t:Rc2.TX_Data: %h", $time, r2.TX_Data);   
    */
 
-
+   /* Other cool monitor statements */
+   always @(r0.RX_Data, r0.RX_Data_Valid) begin
+      if (r0.RX_Data_Valid) begin
+	 case (r0.RX_Data[54:52])
+	   TOKEN: $display("%t:: R0: Dest: %d.  TOKEN", $time, r0.RX_Data[51:48]);
+	   ACK:   $display("%t:: R0: Dest: %d.  ACK", $time, r0.RX_Data[51:48]);
+	   NACK:  $display("%t:: R0: Dest: %d.  NACK", $time, r0.RX_Data[51:48]);
+	   DATA_C:$display("%t:: R0: Dest: %d.  DATA_C", $time, r0.RX_Data[51:48]);
+	   DATA_3:$display("%t:: R0: Dest: %d.  DATA_3", $time, r0.RX_Data[51:48]);
+	   default:$display("%t:: R0: Dest: %d.  **UNKNOWN**", $time, r0.RX_Data[51:48]);
+	 endcase
+      end
+   end // always @ (r0.RX_Data, r0.RX_Data_Valid)
+   
+   always @(r1.RX_Data, r1.RX_Data_Valid) begin
+      if (r1.RX_Data_Valid) begin
+	 case (r1.RX_Data[54:52])
+	   TOKEN: $display("%t:: R1: Dest: %d.  TOKEN", $time, r1.RX_Data[51:48]);
+	   ACK:   $display("%t:: R1: Dest: %d.  ACK", $time, r1.RX_Data[51:48]);
+	   NACK:  $display("%t:: R1: Dest: %d.  NACK", $time, r1.RX_Data[51:48]);
+	   DATA_C:$display("%t:: R1: Dest: %d.  DATA_C", $time, r1.RX_Data[51:48]);
+	   DATA_3:$display("%t:: R1: Dest: %d.  DATA_3", $time, r1.RX_Data[51:48]);
+	   default:$display("%t:: R1: Dest: %d.  **UNKNOWN**", $time, r1.RX_Data[51:48]);
+	 endcase
+      end
+   end // always @ (r0.RX_Data, r0.RX_Data_Valid)
+   always @(r2.RX_Data, r2.RX_Data_Valid) begin
+      if (r2.RX_Data_Valid) begin
+	 case (r2.RX_Data[54:52])
+	   TOKEN: $display("%t:: R2: Dest: %d.  TOKEN", $time, r2.RX_Data[51:48]);
+	   ACK:   $display("%t:: R2: Dest: %d.  ACK", $time, r2.RX_Data[51:48]);
+	   NACK:  $display("%t:: R2: Dest: %d.  NACK", $time, r2.RX_Data[51:48]);
+	   DATA_C:$display("%t:: R2: Dest: %d.  DATA_C", $time, r2.RX_Data[51:48]);
+	   DATA_3:$display("%t:: R2: Dest: %d.  DATA_3", $time, r2.RX_Data[51:48]);
+	   default:$display("%t:: R2: Dest: %d.  **UNKNOWN**", $time, r2.RX_Data[51:48]);
+	 endcase
+      end
+   end
+   
    initial begin
 
 
@@ -186,13 +224,13 @@ module router_tb_template();
       $monitor("%t:: %b",$time, Packet_To_Node_Valid[1]);
       
 
-      send(0,1,2,123);
+      send(0,0,2,123);
       rcv(0,2,123);
 
       send(2,1,1,123);
       rcv(2,1,123);
 
-      send(1,1,2,323);
+      send(1,0,2,323);
       rcv(1,2,323);
 
       #50000;
