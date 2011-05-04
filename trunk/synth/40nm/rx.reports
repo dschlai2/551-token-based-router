@@ -1,0 +1,121 @@
+/*************************
+* RECEIVER REPORT
+*
+* Mike, Rob, Pat
+*************************/
+
+## Print reports
+report_area
+ 
+****************************************
+Report : area
+Design : receiver
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:29:30 2011
+****************************************
+
+Library(s) Used:
+
+    tcbn40lpbwptc (File: /afs/engr.wisc.edu/apps/synopsys-2010/tsmc45nm_libs/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn40lpbwp_120b/tcbn40lpbwptc.db)
+
+Number of ports:               60
+Number of nets:               748
+Number of cells:              743
+Number of references:          88
+
+Combinational area:        690.429613
+Noncombinational area:     303.231597
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:           993.661210
+Total area:                 undefined
+1
+report_timing
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : receiver
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:29:30 2011
+****************************************
+
+Operating Conditions: NCCOM   Library: tcbn40lpbwptc
+Wire Load Model Mode: top
+
+  Startpoint: rx_side/counter_reg[2]
+              (rising edge-triggered flip-flop clocked by Clk_S)
+  Endpoint: rx_side/packet_reg[26]
+            (rising edge-triggered flip-flop clocked by Clk_S)
+  Path Group: Clk_S
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  receiver           TSMC128K_Lowk_Aggresive
+                                           tcbn40lpbwptc
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock Clk_S (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  rx_side/counter_reg[2]/CP (DFCNQD1BWP)                  0.00       0.00 r
+  rx_side/counter_reg[2]/Q (DFCNQD1BWP)                   0.15       0.15 r
+  U573/ZN (ND2D3BWP)                                      0.05       0.20 f
+  U430/ZN (NR2XD3BWP)                                     0.03       0.23 r
+  U565/ZN (ND2D2BWP)                                      0.03       0.26 f
+  U513/ZN (NR2XD2BWP)                                     0.04       0.30 r
+  U607/ZN (ND2D3BWP)                                      0.03       0.33 f
+  U605/Z (AN2D4BWP)                                       0.05       0.38 f
+  U325/ZN (CKND12BWP)                                     0.05       0.43 r
+  U598/ZN (NR2XD8BWP)                                     0.03       0.46 f
+  U479/Z (BUFFD8BWP)                                      0.05       0.51 f
+  U619/ZN (INVD1BWP)                                      0.05       0.56 r
+  U923/ZN (IND2D1BWP)                                     0.05       0.61 r
+  U387/Z (OA211D1BWP)                                     0.08       0.69 r
+  U388/ZN (IND3D0BWP)                                     0.05       0.73 f
+  rx_side/packet_reg[26]/D (DFCNQD1BWP)                   0.00       0.73 f
+  data arrival time                                                  0.73
+
+  clock Clk_S (rise edge)                                 0.75       0.75
+  clock network delay (ideal)                             0.00       0.75
+  rx_side/packet_reg[26]/CP (DFCNQD1BWP)                  0.00       0.75 r
+  library setup time                                     -0.02       0.73
+  data required time                                                 0.73
+  --------------------------------------------------------------------------
+  data required time                                                 0.73
+  data arrival time                                                 -0.73
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+report_constraints -all_violators
+ 
+****************************************
+Report : constraint
+        -all_violators
+Design : receiver
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:29:30 2011
+****************************************
+
+
+   max_area
+
+                             Required        Actual
+   Design                      Area           Area           Slack
+   -----------------------------------------------------------------
+   receiver                     0.00         993.66        -993.66  (VIOLATED)
+
+
+1
+### Write post-synth netlist
+write -f verilog -output receiver.v -hierarchy
+Writing verilog file '/filespace/people/m/mstarr/sandbox/551-token-based-router/synth/40nm/receiver.v'.
+1
+Information: Defining new variable 'prim_inputs'. (CMD-041)
+exit
+Thank you...

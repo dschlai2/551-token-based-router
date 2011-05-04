@@ -1,0 +1,151 @@
+/*************************
+* ROUTER_CORE REPORT
+*
+* Mike, Rob, Pat
+*************************/
+
+## Print reports
+report_area
+ 
+****************************************
+Report : area
+Design : router_core
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:30:04 2011
+****************************************
+
+Library(s) Used:
+
+    tcbn40lpbwptc (File: /afs/engr.wisc.edu/apps/synopsys-2010/tsmc45nm_libs/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn40lpbwp_120b/tcbn40lpbwptc.db)
+
+Number of ports:              176
+Number of nets:               929
+Number of cells:              834
+Number of references:         127
+
+Combinational area:        882.176414
+Noncombinational area:     590.058009
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:          1472.234423
+Total area:                 undefined
+1
+report_timing
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : router_core
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:30:04 2011
+****************************************
+
+Operating Conditions: NCCOM   Library: tcbn40lpbwptc
+Wire Load Model Mode: top
+
+  Startpoint: RX_Data[27]
+              (input port clocked by Clk_R)
+  Endpoint: main_control/state_reg[0]
+            (rising edge-triggered flip-flop clocked by Clk_R)
+  Path Group: Clk_R
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  router_core        TSMC128K_Lowk_Aggresive
+                                           tcbn40lpbwptc
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock Clk_R (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  input external delay                                    0.00       0.00 f
+  RX_Data[27] (in)                                        0.00       0.00 f
+  U717/ZN (CKND3BWP)                                      0.02       0.02 r
+  U577/ZN (ND2D1BWP)                                      0.03       0.04 f
+  U591/ZN (ND2D1BWP)                                      0.02       0.07 r
+  U969/Z (XOR3D4BWP)                                      0.16       0.23 r
+  U728/ZN (CKND4BWP)                                      0.02       0.25 f
+  U710/ZN (NR2XD4BWP)                                     0.02       0.27 r
+  U581/ZN (CKND2BWP)                                      0.02       0.29 f
+  U734/ZN (OAI22D4BWP)                                    0.04       0.33 r
+  U729/ZN (INVD1BWP)                                      0.04       0.37 f
+  U1100/ZN (ND2D1BWP)                                     0.03       0.40 r
+  U674/ZN (IOA21D0BWP)                                    0.07       0.46 r
+  U1099/ZN (ND2D1BWP)                                     0.03       0.50 f
+  U983/Z (XOR3D2BWP)                                      0.13       0.63 r
+  U1003/Z (XOR3D2BWP)                                     0.11       0.73 f
+  U936/ZN (CKND4BWP)                                      0.02       0.75 r
+  U965/ZN (ND2D2BWP)                                      0.02       0.77 f
+  U964/ZN (ND2D2BWP)                                      0.02       0.79 r
+  U971/ZN (NR2XD1BWP)                                     0.02       0.82 f
+  U987/ZN (IND2D2BWP)                                     0.05       0.87 f
+  U924/ZN (XNR2D2BWP)                                     0.08       0.95 f
+  U941/ZN (CKND2BWP)                                      0.02       0.97 r
+  U819/ZN (ND2D2BWP)                                      0.02       0.99 f
+  U815/ZN (ND2D3BWP)                                      0.03       1.02 r
+  U588/ZN (ND2D2BWP)                                      0.03       1.05 f
+  U1256/ZN (OAI21D1BWP)                                   0.03       1.07 r
+  U1253/ZN (AOI21D1BWP)                                   0.03       1.10 f
+  U953/Z (XOR3D2BWP)                                      0.09       1.20 r
+  U723/ZN (CKND4BWP)                                      0.02       1.21 f
+  U722/ZN (NR3D4BWP)                                      0.04       1.25 r
+  U922/ZN (ND2D4BWP)                                      0.03       1.28 f
+  U935/ZN (ND3D3BWP)                                      0.02       1.30 r
+  U808/ZN (INR2XD1BWP)                                    0.05       1.35 r
+  main_control/state_reg[0]/D (DFCND1BWP)                 0.00       1.35 r
+  data arrival time                                                  1.35
+
+  clock Clk_R (rise edge)                                 1.38       1.38
+  clock network delay (ideal)                             0.00       1.38
+  main_control/state_reg[0]/CP (DFCND1BWP)                0.00       1.38 r
+  library setup time                                     -0.03       1.35
+  data required time                                                 1.35
+  --------------------------------------------------------------------------
+  data required time                                                 1.35
+  data arrival time                                                 -1.35
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+report_constraints -all_violators
+ 
+****************************************
+Report : constraint
+        -all_violators
+Design : router_core
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:30:04 2011
+****************************************
+
+
+   min_delay/hold ('Clk_R' group)
+
+                             Required        Actual
+   Endpoint                 Path Delay     Path Delay        Slack
+   -----------------------------------------------------------------
+   ever_versetile/out_reg[6]/D
+                                0.03           0.02 f         0.00  (VIOLATED: increase signficant digits)
+
+
+   max_area
+
+                             Required        Actual
+   Design                      Area           Area           Slack
+   -----------------------------------------------------------------
+   router_core                  0.00        1472.23       -1472.23  (VIOLATED)
+
+
+1
+### Write post-synth netlist
+write -f verilog -output router_core.v -hierarchy
+Writing verilog file '/filespace/people/m/mstarr/sandbox/551-token-based-router/synth/40nm/router_core.v'.
+Warning: Verilog 'assign' or 'tran' statements are written out. (VO-4)
+1
+exit
+Information: Defining new variable 'prim_inputs'. (CMD-041)
+
+Thank you...
