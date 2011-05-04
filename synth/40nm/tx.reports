@@ -1,0 +1,127 @@
+/*************************
+* TRANSMITTER REPORT
+*
+* Mike, Rob, Pat
+*************************/
+
+
+## Print reports
+report_area
+ 
+****************************************
+Report : area
+Design : transmitter
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:29:00 2011
+****************************************
+
+Library(s) Used:
+
+    tcbn40lpbwptc (File: /afs/engr.wisc.edu/apps/synopsys-2010/tsmc45nm_libs/TSMCHOME/digital/Front_End/timing_power_noise/NLDM/tcbn40lpbwp_120b/tcbn40lpbwptc.db)
+
+Number of ports:               60
+Number of nets:               178
+Number of cells:              120
+Number of references:          42
+
+Combinational area:        125.067601
+Noncombinational area:      62.445600
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:           187.513201
+Total area:                 undefined
+1
+report_timing
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : transmitter
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:29:00 2011
+****************************************
+
+Operating Conditions: NCCOM   Library: tcbn40lpbwptc
+Wire Load Model Mode: top
+
+  Startpoint: protocol/counter_reg[0]
+              (rising edge-triggered flip-flop clocked by Clk_S)
+  Endpoint: protocol/S_Data_reg
+            (rising edge-triggered flip-flop clocked by Clk_S)
+  Path Group: Clk_S
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  transmitter        TSMC128K_Lowk_Aggresive
+                                           tcbn40lpbwptc
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock Clk_S (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  protocol/counter_reg[0]/CP (DFCNQD4BWP)                 0.00       0.00 r
+  protocol/counter_reg[0]/Q (DFCNQD4BWP)                  0.16       0.16 r
+  U154/Z (XOR2D1BWP)                                      0.11       0.27 f
+  U244/ZN (INR2D1BWP)                                     0.05       0.32 r
+  U180/Z (CKBD8BWP)                                       0.07       0.39 r
+  U239/ZN (AOI22D1BWP)                                    0.04       0.43 f
+  U195/Z (AN2XD1BWP)                                      0.04       0.47 f
+  U249/Z (MUX2D1BWP)                                      0.05       0.52 f
+  U172/ZN (OAI31D1BWP)                                    0.05       0.58 r
+  U232/ZN (AOI21D1BWP)                                    0.03       0.61 f
+  U209/Z (OA211D1BWP)                                     0.07       0.68 f
+  U175/ZN (OAI211D2BWP)                                   0.03       0.71 r
+  protocol/S_Data_reg/D (DFCNQD1BWP)                      0.00       0.71 r
+  data arrival time                                                  0.71
+
+  clock Clk_S (rise edge)                                 0.75       0.75
+  clock network delay (ideal)                             0.00       0.75
+  protocol/S_Data_reg/CP (DFCNQD1BWP)                     0.00       0.75 r
+  library setup time                                     -0.03       0.72
+  data required time                                                 0.72
+  --------------------------------------------------------------------------
+  data required time                                                 0.72
+  data arrival time                                                 -0.71
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1
+report_constraints -all_violators
+ 
+****************************************
+Report : constraint
+        -all_violators
+Design : transmitter
+Version: D-2010.03-SP3
+Date   : Wed May  4 14:29:00 2011
+****************************************
+
+
+   min_delay/hold ('Clk_S' group)
+
+                             Required        Actual
+   Endpoint                 Path Delay     Path Delay        Slack
+   -----------------------------------------------------------------
+   state_reg[0]/D               0.03           0.01 f        -0.02  (VIOLATED)
+
+
+   max_area
+
+                             Required        Actual
+   Design                      Area           Area           Slack
+   -----------------------------------------------------------------
+   transmitter                  0.00         187.51        -187.51  (VIOLATED)
+
+
+1
+### Write post-synth netlist
+write -f verilog -output transmitter.v -hierarchy
+Writing verilog file '/filespace/people/m/mstarr/sandbox/551-token-based-router/synth/40nm/transmitter.v'.
+1
+Information: Defining new variable 'prim_inputs'. (CMD-041)
+exit
+Thank you...
