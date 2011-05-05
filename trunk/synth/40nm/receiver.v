@@ -1,5 +1,5 @@
 
-module receiver ( RX_Ready, Clk_S, Rst_n, S_Data, RX_Data_Valid, RX_Data );
+module receiver_ps ( RX_Ready, Clk_S, Rst_n, S_Data, RX_Data_Valid, RX_Data );
   output [54:0] RX_Data;
   input RX_Ready, Clk_S, Rst_n, S_Data;
   output RX_Data_Valid;

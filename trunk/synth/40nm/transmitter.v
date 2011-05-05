@@ -1,5 +1,5 @@
 
-module transmitter ( TX_Data, TX_Data_Valid, Clk_S, Rst_n, TX_Ready, S_Data );
+module transmitter_ps ( TX_Data, TX_Data_Valid, Clk_S, Rst_n, TX_Ready, S_Data );
   input [54:0] TX_Data;
   input TX_Data_Valid, Clk_S, Rst_n;
   output TX_Ready, S_Data;
